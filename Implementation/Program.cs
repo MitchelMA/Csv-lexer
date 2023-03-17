@@ -1,3 +1,10 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿namespace Implementation;
 
-Console.WriteLine("Hello, World!");
+internal static class Program
+{
+    internal static void Main(string[] args)
+    {
+        Console.WriteLine("Hello, World!");
+    }
+}
+

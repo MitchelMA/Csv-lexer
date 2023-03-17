@@ -11,4 +11,10 @@
       <ProjectReference Include="..\Lexer\Lexer.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="csv\**">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>
