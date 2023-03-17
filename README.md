@@ -5,4 +5,4 @@ Hier doe ik een poging tot het maken van een simpele csv-lexer die voldoet aan o
 - [x] comment-support
 - [ ] full string-support
 - [ ] negeren van trailing space-chars e.g "John&emsp;,&emsp;Doe" ->  "John" en "Doe"
-- [ ] Embedded line-breaks middels comma's
+- [ ] Embedded line-breaks middels double-qoutes
