@@ -10,7 +10,7 @@ internal static class Program
     {
         Separator = ',',
         CommentStarter = '#',
-        Patches = true,
+        Patches = false,
     };
     
     internal static void Main(string[] args)
@@ -25,7 +25,7 @@ internal static class Program
         
         Console.WriteLine($"Preparing to read file: {TargetFile}");
 
-        CsvLexer lexer = new CsvLexer(TargetFile);
+        CsvLexer lexer = new CsvLexer(TargetFile, CsvSettings);
         string[] lines = lexer.Test()!;
         foreach(var line in lines)
             Console.WriteLine(line);

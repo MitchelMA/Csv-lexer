@@ -70,7 +70,7 @@ public class CsvLexer
     private bool _EOLproc(ref string buffer, ICollection<string> lines)
     {
         string trimmed = buffer.Trim();
-        if (trimmed.Length == 0)
+        if (_settings.Patches && trimmed.Length == 0)
             return false;
 
         lines.Add(trimmed);
@@ -118,7 +118,20 @@ public class CsvLexer
 
     private bool CommentHandler(ref string buffer, ICollection<string> lines, Stream stream)
     {
-        throw new NotImplementedException();
+        // keep consuming till the end of the line
+        int c;
+        while ((c = stream.ReadByte()) is not '\n' and not -1) ;
+        switch (c)
+        {
+            case '\n':
+                _EOLproc(ref buffer, lines);
+                break;
+            case -1:
+                _EOLproc(ref buffer, lines);
+                return false;
+        }
+        _currentModus = PreLexModus.Default;
+        return true;
     }
 
     private bool ToStringModus(int c)
@@ -144,16 +157,17 @@ public class CsvLexer
 
     public string[]? Test()
     {
-        using (FileStream stream = _file.OpenRead())
+        using FileStream stream = _file.OpenRead();
+        int c;
+        Console.WriteLine("Binary Value");
+        while ((c = stream.ReadByte()) != -1)
         {
-            int c;
-            while ((c = stream.ReadByte()) != -1)
-            {
-                Console.Write(c);
-            }
-
-            stream.Position = 0;
-            return PreLex(stream);
+            Console.Write(c);
         }
+            
+        Console.WriteLine("\n----\n");
+
+        stream.Position = 0;
+        return PreLex(stream);
     }
 }
