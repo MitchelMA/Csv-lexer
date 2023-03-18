@@ -35,20 +35,9 @@ public class CsvLexer
         string txt = File.ReadAllText(_file.FullName);
         byte[] bytes = Encoding.UTF8.GetBytes(txt);
         
-        Console.WriteLine(txt);
-        
         using MemoryStream stream = new(bytes);
         CsvLiner liner = new(stream, _settings);
-        int c;
-        Console.WriteLine("Binary Value");
-        while ((c = stream.ReadByte()) != -1)
-        {
-            Console.Write(c);
-        }
-            
-        Console.WriteLine("\n----\n");
 
-        stream.Position = 0;
         return liner.GetLines();
     }
 }
