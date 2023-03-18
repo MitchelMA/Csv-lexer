@@ -1,4 +1,5 @@
-﻿using Lexer.Csv.Modus;
+﻿using System.Text;
+using Lexer.Csv.Modus;
 using Lexer.Helpers;
 
 namespace Lexer.Csv;
@@ -31,7 +32,12 @@ public class CsvLexer
 
     public string[] Test()
     {
-        using FileStream stream = _file.OpenRead();
+        string txt = File.ReadAllText(_file.FullName);
+        byte[] bytes = Encoding.UTF8.GetBytes(txt);
+        
+        Console.WriteLine(txt);
+        
+        using MemoryStream stream = new(bytes);
         CsvLiner liner = new(stream, _settings);
         int c;
         Console.WriteLine("Binary Value");
