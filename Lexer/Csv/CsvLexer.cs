@@ -1,7 +1,7 @@
-﻿using Lexer.Helpers;
-using Lexer.Modus;
+﻿using Lexer.Csv.Modus;
+using Lexer.Helpers;
 
-namespace Lexer;
+namespace Lexer.Csv;
 
 public class CsvLexer
 {
@@ -53,7 +53,7 @@ public class CsvLexer
     /// <param name="fs"></param>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
-    private string[]? PreLex(FileStream fs)
+    private string[] GetLines(FileStream fs)
     {
         string buffer = string.Empty;
         List<string> lines = new();
@@ -144,9 +144,6 @@ public class CsvLexer
 
     private bool ToCommentModus(int c)
     {
-        if (_settings.CommentStarter is null)
-            return false;
-
         if (c == _settings.CommentStarter)
             return true;
 
@@ -155,7 +152,7 @@ public class CsvLexer
 
     #endregion
 
-    public string[]? Test()
+    public string[] Test()
     {
         using FileStream stream = _file.OpenRead();
         int c;
@@ -168,6 +165,6 @@ public class CsvLexer
         Console.WriteLine("\n----\n");
 
         stream.Position = 0;
-        return PreLex(stream);
+        return GetLines(stream);
     }
 }

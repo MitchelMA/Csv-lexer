@@ -1,4 +1,4 @@
-﻿namespace Lexer.Modus;
+﻿namespace Lexer.Csv.Modus;
 
 public enum PreLexModus
 {

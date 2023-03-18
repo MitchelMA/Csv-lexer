@@ -1,4 +1,4 @@
-﻿namespace Lexer;
+﻿namespace Lexer.Csv;
 
 public struct CsvSettings
 {
