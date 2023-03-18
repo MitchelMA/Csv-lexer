@@ -1,6 +1,6 @@
 ﻿using System.Data.Common;
 using System.Data.Odbc;
-using Lexer.Csv.Modus;
+using Lexer.Csv.Enums;
 using Microsoft.VisualBasic.FileIO;
 
 namespace Lexer.Csv;
@@ -10,13 +10,12 @@ internal class CsvLiner
     private int _lastChar = 0;
     private string _lineBuffer = string.Empty;
     private readonly List<string> _lines = new();
-    private PreLexModus _currentModus = PreLexModus.Default;
+    private LexModi _currentMode = LexModi.Default;
     private CsvSettings _settings;
 
-    private bool _forceEnd;
     private Stream _stream;
 
-    private Dictionary<PreLexModus, Func<bool>> _modi = new();
+    private Dictionary<LexModi, Func<bool>> _modi = new();
 
     internal CsvLiner(Stream stream, CsvSettings settings)
     {
@@ -29,16 +28,16 @@ internal class CsvLiner
     {
         _modi.Clear();
 
-        _modi.Add(PreLexModus.Default, DefaultHandler);
-        _modi.Add(PreLexModus.String, StringHandler);
-        _modi.Add(PreLexModus.Comment, CommentHandler);
+        _modi.Add(LexModi.Default, DefaultHandler);
+        _modi.Add(LexModi.String, StringHandler);
+        _modi.Add(LexModi.Comment, CommentHandler);
     }
 
     internal string[] GetLines()
     {
         while (_lastChar != -1)
         {
-            _modi[_currentModus]();
+            _modi[_currentMode]();
         }
 
         return _lines.ToArray();
@@ -61,13 +60,13 @@ internal class CsvLiner
         {
             if (ToCommentModus(_lastChar))
             {
-                _currentModus = PreLexModus.Comment;
+                _currentMode = LexModi.Comment;
                 return true;
             }
 
             if (ToStringModus(_lastChar))
             {
-                _currentModus = PreLexModus.String;
+                _currentMode = LexModi.String;
                 return true;
             }
 
@@ -109,7 +108,7 @@ internal class CsvLiner
 
                 if (t != '"')
                 {
-                    _currentModus = PreLexModus.Default;
+                    _currentMode = LexModi.Default;
                     return true;
                 }
 
@@ -137,7 +136,7 @@ internal class CsvLiner
                 return false;
         }
 
-        _currentModus = PreLexModus.Default;
+        _currentMode = LexModi.Default;
         return true;
     }
 
@@ -148,9 +147,6 @@ internal class CsvLiner
     {
         int c = _stream.ReadByte();
         _stream.Position--;
-
-        if (c == -1)
-            _forceEnd = true;
         return c;
     }
 }

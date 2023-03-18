@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using Lexer.Csv.Modus;
 using Lexer.Helpers;
 
 namespace Lexer.Csv;
@@ -39,5 +38,13 @@ public class CsvLexer
         CsvLiner liner = new(stream, _settings);
 
         return liner.GetLines();
+    }
+
+    public string[][] Test2()
+    {
+        string[] lines = Test();
+        CsvSplitter splitter = new(lines, _settings);
+
+        return splitter.Split();
     }
 }
