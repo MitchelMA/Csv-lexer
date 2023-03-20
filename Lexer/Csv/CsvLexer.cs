@@ -1,14 +1,17 @@
 ﻿using System.Text;
+using Lexer.Csv.Streams;
 
 namespace Lexer.Csv;
 
 public class CsvLexer : IDisposable
 {
     private readonly FileInfo? _file;
-    private readonly string? _filestring;
+    private readonly string _filestring;
     private readonly CsvSettings _settings = CsvSettings.Default;
     private StreamReader _sReader;
     private bool _sDisposed = false;
+
+    private StrippedStream _sStream;
 
     private string[]? _lines;
     private string[][]? _splits;
@@ -23,8 +26,7 @@ public class CsvLexer : IDisposable
     public CsvLexer(string fileText)
     {
         _filestring = fileText;
-        MemoryStream ms = new(Encoding.UTF8.GetBytes(_filestring));
-        _sReader = new(ms);
+        _sStream = new(Encoding.UTF8.GetBytes(fileText));
     }
 
     public CsvLexer(FileInfo file)
@@ -33,7 +35,7 @@ public class CsvLexer : IDisposable
             throw new FileNotFoundException($"File {file.FullName} does not exist");
 
         _file = file;
-        _sReader = _file.OpenText();
+        _sStream = new(Encoding.UTF8.GetBytes(File.ReadAllText(file.FullName)));
     }
 
     public CsvLexer(string fileText, CsvSettings settings) : this(fileText)
@@ -48,22 +50,10 @@ public class CsvLexer : IDisposable
 
     private string[] GetLines()
     {
-        if (_sDisposed && !IsDisposed)
-        {
-            _sReader = GetStream();
-        }
-        CsvLiner liner = new(_sReader, _settings);
+        
+        CsvLiner liner = new(_sStream, _settings);
         string[] lines = liner.GetLines();
-        if (_settings.ImmediateClosing)
-        {
-            _sReader.Dispose();
-            _sDisposed = true;
-        }
-        else
-        {
-            _sReader.DiscardBufferedData();
-            _sReader.BaseStream.Seek(0, SeekOrigin.Begin);
-        }
+        
 
         return lines;
     }
@@ -83,25 +73,11 @@ public class CsvLexer : IDisposable
         return Task.Run(Lex);
     }
 
-    private StreamReader GetStream()
-    {
-        StreamReader? sr = _file?.OpenText();
-
-        if (sr is null)
-        {
-            using MemoryStream ms = new(Encoding.UTF8.GetBytes(_filestring!));
-            sr = new(ms);
-        }
-
-
-        return sr;
-    }
-
     #region IDisposable pattern
 
     private void ReleaseManagedResources()
     {
-        _sReader.Dispose();
+        _sStream.Dispose();
         _sDisposed = true;
     }
 

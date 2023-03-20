@@ -14,7 +14,6 @@ internal static class Program
         CommentStarter = '#',
         Patches = true,
         FirstIsHeader = true,
-        ImmediateClosing = true,
     };
 
     internal static void Main(string[] args)
@@ -28,10 +27,10 @@ internal static class Program
         TargetFile = Path.Combine(args[0], "");
 
         Console.WriteLine($"Preparing to read file: {TargetFile}");
-        // FileInfo info = new(PathHelper.ToAbsoluteDomain(TargetFile));
-        string text = File.ReadAllText(PathHelper.ToAbsoluteDomain(TargetFile));
-        ;
-        using CsvLexer lexer = new CsvLexer(text, CsvSettings);
+        FileInfo info = new(PathHelper.ToAbsoluteDomain(TargetFile));
+        // string text = File.ReadAllText(PathHelper.ToAbsoluteDomain(TargetFile));
+        
+        using CsvLexer lexer = new CsvLexer(info, CsvSettings);
 
         var stopwatch = Stopwatch.StartNew();
         string[][] vals = null!;

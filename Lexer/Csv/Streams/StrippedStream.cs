@@ -8,17 +8,7 @@ internal class StrippedStream : IDisposable
     private byte[] _bytes;
 
 
-    internal long Position
-    {
-        get => _position;
-        set
-        {
-            if (value > _length)
-                return;
-
-            _position = value;
-        }
-    }
+    internal long Position => _position;
 
     internal int Previous
     {
@@ -31,13 +21,23 @@ internal class StrippedStream : IDisposable
         }
     }
 
-    internal int Current => _bytes[_position];
+
+    internal int Current
+    {
+        get
+        {
+            if (Surpassed)
+                return -1;
+
+            return _bytes[_position];
+        }
+    }
 
     internal int Next
     {
         get
         {
-            if (Surpassed || _position+1 >= _length)
+            if (_position+1 >= _length)
                 return -1;
             
             return _bytes[_position + 1];
@@ -59,6 +59,8 @@ internal class StrippedStream : IDisposable
         MoveNext();
         return b;
     }
+
+    internal int Peek() => Current;
 
     internal void Reset()
     {

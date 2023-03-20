@@ -6,7 +6,6 @@ public struct CsvSettings
     public char Separator;
     public char? CommentStarter;
     public bool Patches;
-    public bool ImmediateClosing;
 
     public static CsvSettings Default => new()
     {
@@ -14,6 +13,5 @@ public struct CsvSettings
         Separator = ',',
         CommentStarter = null,
         Patches = false,
-        ImmediateClosing = true,
     };
 }

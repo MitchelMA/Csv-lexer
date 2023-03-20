@@ -1,4 +1,5 @@
 ﻿using Lexer.Csv.Enums;
+using Lexer.Csv.Streams;
 
 namespace Lexer.Csv;
 
@@ -10,13 +11,13 @@ internal class CsvLiner
     private LexModi _currentMode = LexModi.Default;
     private CsvSettings _settings;
 
-    private StreamReader _stream;
+    private StrippedStream _sStream;
 
     private Dictionary<LexModi, Func<bool>> _modi = new();
 
-    internal CsvLiner(StreamReader stream, CsvSettings settings)
+    internal CsvLiner(StrippedStream stream, CsvSettings settings)
     {
-        _stream = stream;
+        _sStream = stream;
         _settings = settings;
         ModiPopulator();
     }
@@ -54,7 +55,7 @@ internal class CsvLiner
     private bool DefaultHandler()
     {
 
-        while ((_lastChar = _stream.Read()) != -1)
+        while ((_lastChar = _sStream.ReadByte()) != -1)
         {
             if (_lastChar == _settings.CommentStarter)
             {
@@ -84,17 +85,17 @@ internal class CsvLiner
     private bool StringHandler()
     {
         _lineBuffer += (char)_lastChar;
-        _lastChar = _stream.Read();
+        _lastChar = _sStream.ReadByte();
         if (_lastChar == '"')
             throw new Exception($"Cannot start string with two double-quotes `\"\"` at {_lineBuffer}");
 
         _lineBuffer += (char)_lastChar;
-        while ((_lastChar = _stream.Read()) != -1)
+        while ((_lastChar = _sStream.ReadByte()) != -1)
         {
             if (_lastChar == '"')
             {
                 _lineBuffer += (char)_lastChar;
-                int t = _stream.Peek();
+                int t = _sStream.Peek();
 
                 if (t == -1)
                 {
@@ -109,7 +110,7 @@ internal class CsvLiner
                     return true;
                 }
 
-                _lastChar = _stream.Read();
+                _lastChar = _sStream.ReadByte();
             }
 
             _lineBuffer += (char)_lastChar;
@@ -121,7 +122,7 @@ internal class CsvLiner
     private bool CommentHandler()
     {
         // keep consuming till the end of the line
-        while ((_lastChar = _stream.Read()) is not '\n' and not -1) ;
+        while ((_lastChar = _sStream.ReadByte()) is not '\n' and not -1) ;
         switch (_lastChar)
         {
             case '\n':
