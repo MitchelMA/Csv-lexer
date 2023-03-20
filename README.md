@@ -3,7 +3,8 @@ Hier doe ik een poging tot het maken van een simpele csv-lexer die voldoet aan o
 
 ## Features
 - [x] comment-support
-- [ ] full string-support
+- [x] full string-support
 - [x] negeren van trailing space-chars e.g "John&emsp;,&emsp;Doe" ->  "John" en "Doe"
 - [x] Embedded line-breaks middels double-qoutes
-- [ ] splitten van de waardes
+- [x] splitten van de waardes
+- [ ] Asynchronous

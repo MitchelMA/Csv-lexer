@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using Lexer;
 using Lexer.Csv;
 
 namespace Implementation;
@@ -13,43 +12,46 @@ internal static class Program
         Separator = ',',
         CommentStarter = '#',
         Patches = true,
+        FirstIsHeader = true,
     };
-    
+
     internal static void Main(string[] args)
     {
         if (args.Length == 0)
         {
-            Console.Error.WriteLine("No arguments given!"); 
+            Console.Error.WriteLine("No arguments given!");
             Environment.Exit(1);
         }
 
         TargetFile = Path.Combine(args[0], "");
-        
+
         Console.WriteLine($"Preparing to read file: {TargetFile}");
 
-        var stopwatch = Stopwatch.StartNew();
         CsvLexer lexer = new CsvLexer(TargetFile, CsvSettings);
-        stopwatch.Stop();
-        
+
+        var stopwatch = Stopwatch.StartNew();
+        var vals = lexer.Lex();
+        stopwatch.Start();
         Console.WriteLine($"Took {stopwatch.Elapsed.TotalMilliseconds}ms");
-        string[] lines = lexer.Test();
-        int l = lines.Length;
-        for (int i = 0; i < l; i++)
+
+
+        for (int i = 0; i < lexer.Header?.Length; i++)
         {
-            string line = lines[i];
-            Console.WriteLine($"{i+1}: {line}");
+            var cur = lexer.Header?[i];
+            Console.Write($"{cur}\t");
         }
 
-        var vals = lexer.Test2();
+        Console.WriteLine();
+
         for (int i = 0; i < vals.Length; i++)
         {
             for (int j = 0; j < vals[i].Length; j++)
             {
                 var cur = vals[i][j];
-                Console.Write(cur + " ");
+                Console.Write($"`{cur}`" + " ");
             }
+
             Console.WriteLine();
         }
     }
 }
-

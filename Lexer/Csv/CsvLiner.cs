@@ -1,7 +1,4 @@
-﻿using System.Data.Common;
-using System.Data.Odbc;
-using Lexer.Csv.Enums;
-using Microsoft.VisualBasic.FileIO;
+﻿using Lexer.Csv.Enums;
 
 namespace Lexer.Csv;
 
@@ -58,26 +55,24 @@ internal class CsvLiner
     {
         while ((_lastChar = _stream.ReadByte()) != -1)
         {
-            if (ToCommentModus(_lastChar))
+            if (_lastChar == _settings.CommentStarter)
             {
                 _currentMode = LexModi.Comment;
                 return true;
             }
 
-            if (ToStringModus(_lastChar))
+            switch (_lastChar)
             {
-                _currentMode = LexModi.String;
-                return true;
+                case '"':
+                    _currentMode = LexModi.String;
+                    return true;
+                case '\n':
+                    _EOLProc();
+                    continue;
+                default:
+                    _lineBuffer += (char)_lastChar;
+                    break;
             }
-
-
-            if (_lastChar == '\n')
-            {
-                _EOLProc();
-                continue;
-            }
-
-            _lineBuffer += (char)_lastChar;
         }
 
         _EOLProc();
@@ -99,6 +94,7 @@ internal class CsvLiner
             {
                 _lineBuffer += (char)_lastChar;
                 int t = SeekByte();
+
                 if (t == -1)
                 {
                     _EOLProc();
@@ -140,13 +136,11 @@ internal class CsvLiner
         return true;
     }
 
-    private bool ToStringModus(int c) => c == '"';
-    private bool ToCommentModus(int c) => c == _settings.CommentStarter;
-
     private int SeekByte()
     {
         int c = _stream.ReadByte();
-        _stream.Position--;
+        if (c != -1)
+            _stream.Position--;
         return c;
     }
 }

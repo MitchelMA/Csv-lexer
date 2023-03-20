@@ -7,6 +7,13 @@ public class CsvLexer
 {
     private readonly FileInfo _file;
     private readonly CsvSettings _settings = CsvSettings.Default;
+    private string[]? _lines;
+    private string[][]? _splits;
+    private string[]? _header;
+
+    public string[]? Lines => _lines;
+    public string[][]? Splits => _splits;
+    public string[]? Header => _header;
 
     public CsvLexer(string filePath)
     {
@@ -29,7 +36,7 @@ public class CsvLexer
         _settings = settings;
     }
 
-    public string[] Test()
+    private string[] GetLines()
     {
         string txt = File.ReadAllText(_file.FullName);
         byte[] bytes = Encoding.UTF8.GetBytes(txt);
@@ -40,11 +47,14 @@ public class CsvLexer
         return liner.GetLines();
     }
 
-    public string[][] Test2()
+    public string[][] Lex()
     {
-        string[] lines = Test();
-        CsvSplitter splitter = new(lines, _settings);
+        _lines = GetLines();
+        using CsvSplitter splitter = new(_lines, _settings);
+        _splits = splitter.Split();
 
-        return splitter.Split();
+        _header = splitter.Header;
+
+        return _splits;
     }
 }
