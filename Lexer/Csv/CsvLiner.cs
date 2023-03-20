@@ -1,4 +1,5 @@
-﻿using Lexer.Csv.Enums;
+﻿using System.Text;
+using Lexer.Csv.Enums;
 using Lexer.Csv.Streams;
 
 namespace Lexer.Csv;
@@ -6,7 +7,7 @@ namespace Lexer.Csv;
 internal class CsvLiner
 {
     private int _lastChar = 0;
-    private string _lineBuffer = string.Empty;
+    private StringBuilder _lineBuffer = new();
     private readonly List<string> _lines = new();
     private LexModi _currentMode = LexModi.Default;
     private CsvSettings _settings;
@@ -43,18 +44,17 @@ internal class CsvLiner
 
     private bool _EOLProc()
     {
-        string trimmed = _lineBuffer.Trim();
+        string trimmed = _lineBuffer.ToString();
         if (_settings.Patches && trimmed.Length == 0)
             return false;
 
         _lines.Add(trimmed);
-        _lineBuffer = "";
+        _lineBuffer.Clear();
         return true;
     }
 
     private bool DefaultHandler()
     {
-
         while ((_lastChar = _sStream.ReadByte()) != -1)
         {
             if (_lastChar == _settings.CommentStarter)
@@ -72,7 +72,8 @@ internal class CsvLiner
                     _EOLProc();
                     continue;
                 default:
-                    _lineBuffer += (char)_lastChar;
+                    if (_lastChar is not ' ' and not '\r')
+                        _lineBuffer.Append((char)_lastChar);
                     break;
             }
         }
@@ -84,17 +85,18 @@ internal class CsvLiner
 
     private bool StringHandler()
     {
-        _lineBuffer += (char)_lastChar;
+        _lineBuffer.Append((char)_lastChar);
         _lastChar = _sStream.ReadByte();
         if (_lastChar == '"')
             throw new Exception($"Cannot start string with two double-quotes `\"\"` at {_lineBuffer}");
 
-        _lineBuffer += (char)_lastChar;
+        _lineBuffer.Append((char)_lastChar);
         while ((_lastChar = _sStream.ReadByte()) != -1)
         {
             if (_lastChar == '"')
             {
-                _lineBuffer += (char)_lastChar;
+                // _lineBuffer += (char)_lastChar;
+                _lineBuffer.Append((char)_lastChar);
                 int t = _sStream.Peek();
 
                 if (t == -1)
@@ -113,7 +115,7 @@ internal class CsvLiner
                 _lastChar = _sStream.ReadByte();
             }
 
-            _lineBuffer += (char)_lastChar;
+            _lineBuffer.Append((char)_lastChar);
         }
 
         throw new Exception($"String never ended with `\"` at {_lineBuffer}");

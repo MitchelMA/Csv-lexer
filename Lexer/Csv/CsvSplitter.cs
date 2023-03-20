@@ -7,7 +7,7 @@ namespace Lexer.Csv;
 internal class CsvSplitter : IDisposable
 {
     private StrippedStream _lineStream;
-    private string _splitBuffer = string.Empty;
+    private StringBuilder _splitBuffer = new();
     private int _lastChar = 0;
     private string[]? _header;
 
@@ -95,9 +95,9 @@ internal class CsvSplitter : IDisposable
 
     private void _EOSProc()
     {
-        string trimmed = _splitBuffer.Trim();
+        string trimmed = _splitBuffer.ToString();
         _lineSplits.Add(trimmed);
-        _splitBuffer = "";
+        _splitBuffer.Clear();
     }
 
     private bool DefaultHandler()
@@ -115,8 +115,8 @@ internal class CsvSplitter : IDisposable
                 _EOSProc();
                 continue;
             }
-
-            _splitBuffer += (char)_lastChar;
+            if(_lastChar is not ' ' and not '\r')
+                _splitBuffer.Append((char)_lastChar);
         }
 
         _EOSProc();
@@ -148,7 +148,7 @@ internal class CsvSplitter : IDisposable
                 _lastChar = _lineStream.ReadByte();
             }
 
-            _splitBuffer += (char)_lastChar;
+            _splitBuffer.Append((char)_lastChar);
         }
 
         return false;
@@ -159,6 +159,7 @@ internal class CsvSplitter : IDisposable
 
     private void ReleaseUnmanagedResources()
     {
+        _splitBuffer.Clear();
     }
 
     private void ReleaseManagedResources()

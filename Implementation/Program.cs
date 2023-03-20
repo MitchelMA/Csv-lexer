@@ -29,12 +29,14 @@ internal static class Program
         Console.WriteLine($"Preparing to read file: {TargetFile}");
         FileInfo info = new(PathHelper.ToAbsoluteDomain(TargetFile));
         
-        using CsvLexer lexer = new CsvLexer(info, CsvSettings);
+        CsvLexer lexer = new CsvLexer(info, CsvSettings);
 
         var stopwatch = Stopwatch.StartNew();
         var vals = lexer.Lex();
         stopwatch.Stop();
-        Console.WriteLine($"Took {stopwatch.Elapsed.TotalMilliseconds}ms");
+        Console.WriteLine($"Took {stopwatch.Elapsed.TotalSeconds}s");
+        Console.WriteLine($"Line-count: {lexer.Lines!.Length}");
+        Console.WriteLine($"{GC.GetTotalMemory(true) * 9.537E-7f}mb usage");
 
         for (int i = 0; i < lexer.Header?.Length; i++)
         {
@@ -43,16 +45,21 @@ internal static class Program
         }
 
         Console.WriteLine();
+        Console.ReadKey();
+        
+        int l = vals.Length > 10 ? 10 : vals.Length;
 
-        // for (int i = 0; i < vals.Length; i++)
-        // {
-        //     for (int j = 0; j < vals[i].Length; j++)
-        //     {
-        //         var cur = vals[i][j];
-        //         Console.Write($"`{cur}`\t");
-        //     }
-        //
-        //     Console.WriteLine();
-        // }
+        for (int i = 0; i < l; i++)
+        {
+            for (int j = 0; j < vals[i].Length; j++)
+            {
+                var cur = vals[i][j];
+                Console.Write($"`{cur}`\t");
+            }
+        
+            Console.WriteLine();
+        }
+        
+        Console.ReadKey();
     }
 }
