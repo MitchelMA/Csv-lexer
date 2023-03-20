@@ -11,7 +11,7 @@ internal static class Program
     internal static CsvSettings CsvSettings = new()
     {
         Separator = ',',
-        // CommentStarter = '#',
+        CommentStarter = '#',
         Patches = true,
     };
     
