@@ -22,17 +22,10 @@ public class CsvLexer
         {
             throw new FileNotFoundException($"File {_file.FullName} does not exist");
         }
-
     }
 
-    public CsvLexer(string filepath, CsvSettings settings)
+    public CsvLexer(string filepath, CsvSettings settings) : this(filepath)
     {
-        _file = new FileInfo(PathHelper.ToAbsoluteDomain(filepath));
-        if (!_file.Exists)
-        {
-            throw new FileNotFoundException($"File {_file.FullName} does not exist");
-        }
-
         _settings = settings;
     }
 
@@ -40,7 +33,7 @@ public class CsvLexer
     {
         string txt = File.ReadAllText(_file.FullName);
         byte[] bytes = Encoding.UTF8.GetBytes(txt);
-        
+
         using MemoryStream stream = new(bytes);
         CsvLiner liner = new(stream, _settings);
 
