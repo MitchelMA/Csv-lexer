@@ -10,11 +10,11 @@ internal class CsvLiner
     private LexModi _currentMode = LexModi.Default;
     private CsvSettings _settings;
 
-    private Stream _stream;
+    private StreamReader _stream;
 
     private Dictionary<LexModi, Func<bool>> _modi = new();
 
-    internal CsvLiner(Stream stream, CsvSettings settings)
+    internal CsvLiner(StreamReader stream, CsvSettings settings)
     {
         _stream = stream;
         _settings = settings;
@@ -53,7 +53,8 @@ internal class CsvLiner
 
     private bool DefaultHandler()
     {
-        while ((_lastChar = _stream.ReadByte()) != -1)
+
+        while ((_lastChar = _stream.Read()) != -1)
         {
             if (_lastChar == _settings.CommentStarter)
             {
@@ -83,17 +84,17 @@ internal class CsvLiner
     private bool StringHandler()
     {
         _lineBuffer += (char)_lastChar;
-        _lastChar = _stream.ReadByte();
+        _lastChar = _stream.Read();
         if (_lastChar == '"')
-            throw new Exception($"Cannot start string with two double-quotes `\"\"` at {_stream.Position}");
+            throw new Exception($"Cannot start string with two double-quotes `\"\"` at {_lineBuffer}");
 
         _lineBuffer += (char)_lastChar;
-        while ((_lastChar = _stream.ReadByte()) != -1)
+        while ((_lastChar = _stream.Read()) != -1)
         {
             if (_lastChar == '"')
             {
                 _lineBuffer += (char)_lastChar;
-                int t = SeekByte();
+                int t = _stream.Peek();
 
                 if (t == -1)
                 {
@@ -108,19 +109,19 @@ internal class CsvLiner
                     return true;
                 }
 
-                _lastChar = _stream.ReadByte();
+                _lastChar = _stream.Read();
             }
 
             _lineBuffer += (char)_lastChar;
         }
 
-        throw new Exception($"String never ended with `\"` at {_stream.Position}");
+        throw new Exception($"String never ended with `\"` at {_lineBuffer}");
     }
 
     private bool CommentHandler()
     {
         // keep consuming till the end of the line
-        while ((_lastChar = _stream.ReadByte()) is not '\n' and not -1) ;
+        while ((_lastChar = _stream.Read()) is not '\n' and not -1) ;
         switch (_lastChar)
         {
             case '\n':
@@ -134,13 +135,5 @@ internal class CsvLiner
 
         _currentMode = LexModi.Default;
         return true;
-    }
-
-    private int SeekByte()
-    {
-        int c = _stream.ReadByte();
-        if (c != -1)
-            _stream.Position--;
-        return c;
     }
 }

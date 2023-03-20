@@ -32,10 +32,10 @@ internal class CsvSplitter : IDisposable
             if (value == _currentLineIdx)
                 return;
 
+            _lineStream.Dispose();
             _currentLineIdx = value;
             if (_currentLineIdx >= _lines.Length)
             {
-                _lineStream.Dispose();
                 return;
             }
 

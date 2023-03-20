@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Lexer.Csv;
+using Lexer.Helpers;
 
 namespace Implementation;
 
@@ -13,6 +14,7 @@ internal static class Program
         CommentStarter = '#',
         Patches = true,
         FirstIsHeader = true,
+        ImmediateClosing = true,
     };
 
     internal static void Main(string[] args)
@@ -26,11 +28,15 @@ internal static class Program
         TargetFile = Path.Combine(args[0], "");
 
         Console.WriteLine($"Preparing to read file: {TargetFile}");
-
-        CsvLexer lexer = new CsvLexer(TargetFile, CsvSettings);
+        // FileInfo info = new(PathHelper.ToAbsoluteDomain(TargetFile));
+        string text = File.ReadAllText(PathHelper.ToAbsoluteDomain(TargetFile));
+        ;
+        using CsvLexer lexer = new CsvLexer(text, CsvSettings);
 
         var stopwatch = Stopwatch.StartNew();
-        var vals = lexer.Lex();
+        string[][] vals = null!;
+        vals = lexer.Lex();
+
         stopwatch.Stop();
         Console.WriteLine($"Took {stopwatch.Elapsed.TotalMilliseconds}ms");
 
@@ -47,7 +53,7 @@ internal static class Program
             for (int j = 0; j < vals[i].Length; j++)
             {
                 var cur = vals[i][j];
-                Console.Write($"`{cur}`" + " ");
+                Console.Write($"`{cur}`\t");
             }
 
             Console.WriteLine();
