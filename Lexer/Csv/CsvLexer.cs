@@ -54,7 +54,11 @@ public class CsvLexer
         _splits = splitter.Split();
 
         _header = splitter.Header;
-
         return _splits;
+    }
+
+    public Task<string[][]> LexAsync()
+    {
+        return Task.Run(Lex);
     }
 }

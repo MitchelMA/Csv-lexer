@@ -31,9 +31,8 @@ internal static class Program
 
         var stopwatch = Stopwatch.StartNew();
         var vals = lexer.Lex();
-        stopwatch.Start();
+        stopwatch.Stop();
         Console.WriteLine($"Took {stopwatch.Elapsed.TotalMilliseconds}ms");
-
 
         for (int i = 0; i < lexer.Header?.Length; i++)
         {

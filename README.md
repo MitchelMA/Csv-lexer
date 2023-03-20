@@ -7,4 +7,4 @@ Hier doe ik een poging tot het maken van een simpele csv-lexer die voldoet aan o
 - [x] negeren van trailing space-chars e.g "John&emsp;,&emsp;Doe" ->  "John" en "Doe"
 - [x] Embedded line-breaks middels double-qoutes
 - [x] splitten van de waardes
-- [ ] Asynchronous
+- [x] Asynchronous
