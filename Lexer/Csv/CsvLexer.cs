@@ -6,9 +6,7 @@ namespace Lexer.Csv;
 public class CsvLexer : IDisposable
 {
     private readonly FileInfo? _file;
-    private readonly string _filestring;
     private readonly CsvSettings _settings = CsvSettings.Default;
-    private StreamReader _sReader;
     private bool _sDisposed = false;
 
     private StrippedStream _sStream;
@@ -25,7 +23,6 @@ public class CsvLexer : IDisposable
 
     public CsvLexer(string fileText)
     {
-        _filestring = fileText;
         _sStream = new(Encoding.UTF8.GetBytes(fileText));
     }
 
@@ -35,7 +32,7 @@ public class CsvLexer : IDisposable
             throw new FileNotFoundException($"File {file.FullName} does not exist");
 
         _file = file;
-        _sStream = new(Encoding.UTF8.GetBytes(File.ReadAllText(file.FullName)));
+        _sStream = new(File.ReadAllText(file.FullName));
     }
 
     public CsvLexer(string fileText, CsvSettings settings) : this(fileText)
@@ -50,16 +47,18 @@ public class CsvLexer : IDisposable
 
     private string[] GetLines()
     {
-        
         CsvLiner liner = new(_sStream, _settings);
         string[] lines = liner.GetLines();
-        
+        _sStream.Reset();
 
         return lines;
     }
 
     public string[][] Lex()
     {
+        if (_splits is not null)
+            return _splits;
+        
         _lines = GetLines();
         using CsvSplitter splitter = new(_lines, _settings);
         _splits = splitter.Split();

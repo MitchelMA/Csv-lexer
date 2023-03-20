@@ -1,13 +1,14 @@
-﻿namespace Lexer.Csv.Streams;
+﻿using System.Text;
+
+namespace Lexer.Csv.Streams;
 
 internal class StrippedStream : IDisposable
 {
     private long _position = 0;
-    private long _length;
-    
     private byte[] _bytes;
 
-
+    internal long Length => _bytes.Length;
+    
     internal long Position => _position;
 
     internal int Previous
@@ -20,7 +21,6 @@ internal class StrippedStream : IDisposable
             return _bytes[_position - 1];
         }
     }
-
 
     internal int Current
     {
@@ -37,20 +37,30 @@ internal class StrippedStream : IDisposable
     {
         get
         {
-            if (_position+1 >= _length)
+            if (_position + 1 >= Length)
                 return -1;
-            
+
             return _bytes[_position + 1];
         }
     }
-    private bool Surpassed => _position >= _length;
+
+    private bool Surpassed => _position >= Length;
 
     internal bool IsDisposed { get; private set; } = false;
 
     internal StrippedStream(IEnumerable<byte> bytes)
     {
         _bytes = bytes.ToArray();
-        _length = _bytes.Length;
+    }
+
+    internal StrippedStream(IEnumerable<char> chars)
+    {
+        _bytes = chars.Select(x => (byte)x).ToArray();
+    }
+
+    internal StrippedStream(string text)
+    {
+        _bytes = Encoding.UTF8.GetBytes(text);
     }
 
     internal int ReadByte()
@@ -77,7 +87,6 @@ internal class StrippedStream : IDisposable
     private void ReleaseManagedResources()
     {
         _position = 0;
-        _length = 0;
         _bytes = null!;
     }
 

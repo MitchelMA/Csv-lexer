@@ -1,11 +1,12 @@
 ﻿using System.Text;
 using Lexer.Csv.Enums;
+using Lexer.Csv.Streams;
 
 namespace Lexer.Csv;
 
 internal class CsvSplitter : IDisposable
 {
-    private Stream _lineStream;
+    private StrippedStream _lineStream;
     private string _splitBuffer = string.Empty;
     private int _lastChar = 0;
     private string[]? _header;
@@ -39,8 +40,7 @@ internal class CsvSplitter : IDisposable
                 return;
             }
 
-            byte[] bytes = Encoding.UTF8.GetBytes(_lines[_currentLineIdx]);
-            _lineStream = new MemoryStream(bytes);
+            _lineStream = new(_lines[_currentLineIdx]);
         }
     }
 
@@ -52,7 +52,7 @@ internal class CsvSplitter : IDisposable
     {
         _lines = lines;
         _settings = settings;
-        _lineStream = new MemoryStream(Encoding.UTF8.GetBytes(lines[0]));
+        _lineStream = new(lines[0]);
 
         ModiPopulator();
     }
@@ -130,7 +130,7 @@ internal class CsvSplitter : IDisposable
         {
             if (_lastChar == '"')
             {
-                int t = SeekByte();
+                int t = _lineStream.Peek();
                 if (t == -1)
                 {
                     _EOSProc();
@@ -153,17 +153,9 @@ internal class CsvSplitter : IDisposable
 
         return false;
     }
+    
 
-    private int SeekByte()
-    {
-        int c = _lineStream.ReadByte();
-        if (c != -1)
-            _lineStream.Position--;
-
-        return c;
-    }
-
-    #region IDisposable pattern
+    #region IDisposable Pattern
 
     private void ReleaseUnmanagedResources()
     {

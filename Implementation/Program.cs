@@ -28,14 +28,11 @@ internal static class Program
 
         Console.WriteLine($"Preparing to read file: {TargetFile}");
         FileInfo info = new(PathHelper.ToAbsoluteDomain(TargetFile));
-        // string text = File.ReadAllText(PathHelper.ToAbsoluteDomain(TargetFile));
         
         using CsvLexer lexer = new CsvLexer(info, CsvSettings);
 
         var stopwatch = Stopwatch.StartNew();
-        string[][] vals = null!;
-        vals = lexer.Lex();
-
+        var vals = lexer.Lex();
         stopwatch.Stop();
         Console.WriteLine($"Took {stopwatch.Elapsed.TotalMilliseconds}ms");
 
@@ -47,15 +44,15 @@ internal static class Program
 
         Console.WriteLine();
 
-        for (int i = 0; i < vals.Length; i++)
-        {
-            for (int j = 0; j < vals[i].Length; j++)
-            {
-                var cur = vals[i][j];
-                Console.Write($"`{cur}`\t");
-            }
-
-            Console.WriteLine();
-        }
+        // for (int i = 0; i < vals.Length; i++)
+        // {
+        //     for (int j = 0; j < vals[i].Length; j++)
+        //     {
+        //         var cur = vals[i][j];
+        //         Console.Write($"`{cur}`\t");
+        //     }
+        //
+        //     Console.WriteLine();
+        // }
     }
 }
