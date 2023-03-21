@@ -4,89 +4,61 @@ namespace Lexer.Csv.Streams;
 
 internal class StrippedStream : IDisposable
 {
-    private long _position = 0;
-    private byte[] _bytes;
-
-    internal long Length => _bytes.Length;
-
-    internal long Position => _position;
-
-    internal int Previous
-    {
-        get
-        {
-            if (_position == 0)
-                return -1;
-
-            return _bytes[_position - 1];
-        }
-    }
-
-    internal int Current
-    {
-        get
-        {
-            if (Surpassed)
-                return -1;
-
-            return _bytes[_position];
-        }
-    }
-
-    internal int Next
-    {
-        get
-        {
-            if (_position + 1 >= Length)
-                return -1;
-
-            return _bytes[_position + 1];
-        }
-    }
-
-    private bool Surpassed => _position >= Length;
+    private readonly IEnumerator<byte> _bytes;
+    private int _lastValue;
+    private int _nextValue;
 
     internal bool IsDisposed { get; private set; } = false;
 
-    internal StrippedStream(IEnumerable<byte> bytes)
+    internal StrippedStream(IEnumerable<byte> byteCollection)
     {
-        _bytes = bytes.ToArray();
+        _bytes = byteCollection.GetEnumerator();
+        // the first setup of the values to proceed reading further
+        StartProc();
     }
 
-    internal StrippedStream(IEnumerable<char> chars)
+    internal StrippedStream(string text) : this(Encoding.UTF8.GetBytes(text))
     {
-        _bytes = chars.Select(x => (byte)x).ToArray();
     }
 
-    internal StrippedStream(string text)
+    private void StartProc()
     {
-        _bytes = Encoding.UTF8.GetBytes(text);
+        _bytes.MoveNext();
+        _nextValue = _bytes.Current;
+        ReadValues();
+    }
+
+    private bool ReadValues()
+    {
+        _lastValue = _nextValue;
+        _nextValue = _bytes.MoveNext() ? _bytes.Current : -1;
+
+        return true;
     }
 
     internal int ReadByte()
     {
-        int b = Current;
-        _position++;
-        return b;
+        int val = _lastValue;
+        ReadValues();
+        return val;
     }
 
-    internal int Peek() => Current;
+    internal int Peek() => _lastValue;
 
     internal void Reset()
     {
-        _position = 0;
+        _bytes.Reset();
     }
 
     #region IDisposable Pattern
 
     private void ReleaseManagedResources()
     {
+        _bytes.Dispose();
     }
 
     private void ReleaseUnmanagedResources()
     {
-        _position = 0;
-        _bytes = null!;
     }
 
     private void Dispose(bool disposing)

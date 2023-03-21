@@ -96,7 +96,6 @@ internal class CsvLiner
         {
             if (_lastChar == '"')
             {
-                // _lineBuffer += (char)_lastChar;
                 _lineBuffer.Append((char)_lastChar);
                 int t = _sStream.Peek();
 

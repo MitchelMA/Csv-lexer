@@ -22,7 +22,7 @@ public class CsvLexer : IDisposable
 
     public CsvLexer(string fileText)
     {
-        _sStream = new(Encoding.UTF8.GetBytes(fileText));
+        _sStream = new(fileText);
     }
 
     public CsvLexer(FileInfo file)
