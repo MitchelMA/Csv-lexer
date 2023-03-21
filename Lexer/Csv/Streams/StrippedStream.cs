@@ -8,7 +8,7 @@ internal class StrippedStream : IDisposable
     private byte[] _bytes;
 
     internal long Length => _bytes.Length;
-    
+
     internal long Position => _position;
 
     internal int Previous
@@ -66,7 +66,7 @@ internal class StrippedStream : IDisposable
     internal int ReadByte()
     {
         int b = Current;
-        MoveNext();
+        _position++;
         return b;
     }
 
@@ -77,21 +77,16 @@ internal class StrippedStream : IDisposable
         _position = 0;
     }
 
-    private void MoveNext()
-    {
-        _position++;
-    }
-
     #region IDisposable Pattern
 
     private void ReleaseManagedResources()
     {
-        _position = 0;
-        _bytes = null!;
     }
 
     private void ReleaseUnmanagedResources()
     {
+        _position = 0;
+        _bytes = null!;
     }
 
     private void Dispose(bool disposing)

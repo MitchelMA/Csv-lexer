@@ -28,7 +28,7 @@ internal static class Program
 
         Console.WriteLine($"Preparing to read file: {TargetFile}");
         FileInfo info = new(PathHelper.ToAbsoluteDomain(TargetFile));
-        
+
         CsvLexer lexer = new CsvLexer(info, CsvSettings);
 
         var stopwatch = Stopwatch.StartNew();
@@ -46,7 +46,7 @@ internal static class Program
 
         Console.WriteLine();
         Console.ReadKey();
-        
+
         int l = vals.Length > 10 ? 10 : vals.Length;
 
         for (int i = 0; i < l; i++)
@@ -56,10 +56,10 @@ internal static class Program
                 var cur = vals[i][j];
                 Console.Write($"`{cur}`\t");
             }
-        
+
             Console.WriteLine();
         }
-        
+
         Console.ReadKey();
     }
 }

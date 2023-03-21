@@ -7,23 +7,23 @@ namespace Lexer.Csv;
 internal class CsvSplitter : IDisposable
 {
     private StrippedStream _lineStream;
-    private StringBuilder _splitBuffer = new();
+    private readonly StringBuilder _splitBuffer = new();
     private int _lastChar = 0;
     private string[]? _header;
 
     private int _currentLineIdx = 0;
 
     // The current line that's being worked on
-    private List<string> _lineSplits = new();
+    private readonly List<string> _lineSplits = new();
 
     // the collection of split lines
-    private List<string[]> _splitLines = new();
+    private readonly List<string[]> _splitLines = new();
 
-    private string[] _lines;
-    private CsvSettings _settings;
+    private readonly string[] _lines;
+    private readonly CsvSettings _settings;
 
     private LexModi _currentMode = LexModi.Default;
-    private Dictionary<LexModi, Func<bool>> _modi = new();
+    private readonly Dictionary<LexModi, Func<bool>> _modi = new();
 
     internal int CurrentLineIdx
     {
@@ -115,7 +115,8 @@ internal class CsvSplitter : IDisposable
                 _EOSProc();
                 continue;
             }
-            if(_lastChar is not ' ' and not '\r')
+
+            if (_lastChar is not ' ' and not '\r')
                 _splitBuffer.Append((char)_lastChar);
         }
 
@@ -153,7 +154,7 @@ internal class CsvSplitter : IDisposable
 
         return false;
     }
-    
+
 
     #region IDisposable Pattern
 

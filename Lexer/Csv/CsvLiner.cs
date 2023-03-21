@@ -7,14 +7,15 @@ namespace Lexer.Csv;
 internal class CsvLiner
 {
     private int _lastChar = 0;
-    private StringBuilder _lineBuffer = new();
+    private readonly StringBuilder _lineBuffer = new();
     private readonly List<string> _lines = new();
     private LexModi _currentMode = LexModi.Default;
-    private CsvSettings _settings;
+    private readonly CsvSettings _settings;
 
-    private StrippedStream _sStream;
+    // This class is borrowing this "stream", so it is not allowed to dispose it
+    private readonly StrippedStream _sStream;
 
-    private Dictionary<LexModi, Func<bool>> _modi = new();
+    private readonly Dictionary<LexModi, Func<bool>> _modi = new();
 
     internal CsvLiner(StrippedStream stream, CsvSettings settings)
     {

@@ -7,9 +7,8 @@ public class CsvLexer : IDisposable
 {
     private readonly FileInfo? _file;
     private readonly CsvSettings _settings = CsvSettings.Default;
-    private bool _sDisposed = false;
 
-    private StrippedStream _sStream;
+    private readonly StrippedStream _sStream;
 
     private string[]? _lines;
     private string[][]? _splits;
@@ -58,7 +57,7 @@ public class CsvLexer : IDisposable
     {
         if (_splits is not null)
             return _splits;
-        
+
         _lines = GetLines();
         using CsvSplitter splitter = new(_lines, _settings);
         _splits = splitter.Split();
@@ -77,11 +76,13 @@ public class CsvLexer : IDisposable
     private void ReleaseManagedResources()
     {
         _sStream.Dispose();
-        _sDisposed = true;
     }
 
     private void ReleaseUnmanagedResources()
     {
+        _lines = null;
+        _splits = null;
+        _header = null;
     }
 
     private void Dispose(bool disposing)
