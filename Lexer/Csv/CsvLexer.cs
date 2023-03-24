@@ -1,4 +1,5 @@
-﻿using Lexer.Csv.Streams;
+﻿using Lexer.Csv.Deserialization;
+using Lexer.Csv.Streams;
 
 namespace Lexer.Csv;
 
@@ -65,17 +66,23 @@ public class CsvLexer : IDisposable
         return _splits;
     }
 
-    public void Test()
+    public T[] Deserialize<T>() where T : new()
     {
-        Console.WriteLine("Testing to convert from string value `33` to int");
-        // int value = Deserialization.Converter.ConvertTo<int>("33");
-        object value = Deserialization.Converter.ConvertToType(typeof(int), "33");
-        Console.WriteLine(value);
+        if (!_settings.FirstIsHeader)
+            throw new Exception("FirstIsHeader needs to be set to `True` in the settings for deserialization");
+
+        Lex();
+        return CsvDeserializer.Deserialize<T>(_header!, _splits!);
     }
 
     public Task<string[][]> LexAsync()
     {
         return Task.Run(Lex);
+    }
+
+    public Task<T[]> DeserializeAsync<T>() where T : new()
+    {
+        return Task.Run(Deserialize<T>);
     }
 
     #region IDisposable pattern
