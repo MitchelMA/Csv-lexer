@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using Lexer.Csv.Deserialization;
 using Lexer.Csv.Streams;
 
 namespace Lexer.Csv;
@@ -66,9 +66,23 @@ public class CsvLexer : IDisposable
         return _splits;
     }
 
+    public T[] Deserialize<T>() where T : new()
+    {
+        if (!_settings.FirstIsHeader)
+            throw new Exception("FirstIsHeader needs to be set to `True` in the settings for deserialization");
+
+        Lex();
+        return CsvDeserializer.Deserialize<T>(_header!, _splits!);
+    }
+
     public Task<string[][]> LexAsync()
     {
         return Task.Run(Lex);
+    }
+
+    public Task<T[]> DeserializeAsync<T>() where T : new()
+    {
+        return Task.Run(Deserialize<T>);
     }
 
     #region IDisposable pattern

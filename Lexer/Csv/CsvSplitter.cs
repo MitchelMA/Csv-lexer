@@ -96,7 +96,7 @@ internal class CsvSplitter : IDisposable
     private void _EOSProc()
     {
         string trimmed = _splitBuffer.ToString();
-        _lineSplits.Add(trimmed);
+        _lineSplits.Add(trimmed.Length > 0 ? trimmed : null!);
         _splitBuffer.Clear();
     }
 
