@@ -7,11 +7,12 @@ namespace Implementation;
 
 internal static class Program
 {
-    private static readonly string[] Files = 
+    private static readonly string[] Files =
     {
         "./csv/dates.csv",
         "./csv/simple.csv",
-        "./csv/test.csv"
+        "./csv/test.csv",
+        "./csv/big.csv"
     };
 
     private static readonly CsvSettings CsvSettings = new()
@@ -25,7 +26,7 @@ internal static class Program
     internal static void Main(string[] args)
     {
         int idx = 0;
-        foreach(var fileName in Files)
+        foreach (var fileName in Files)
         {
             FileInfo info = new(PathHelper.ToAbsoluteDomain(fileName));
 
@@ -68,27 +69,36 @@ internal static class Program
                 {
                     model = lexer.Deserialize<DateModel>();
                 }
-                   break;
+                    break;
 
                 case 1:
                 {
                     model = lexer.Deserialize<SimpleModel>();
                 }
-                   break;
+                    break;
 
                 case 2:
                 {
                     model = lexer.Deserialize<TestModel>();
                 }
-                   break;
+                    break;
+
+                case 3:
+                {
+                    model = lexer.Deserialize<BigModel>();
+                }
+                    break;
             }
 
             foreach (var value in model)
             {
                 Console.WriteLine($"{value}\n");
             }
+
             Console.WriteLine("------------------------\n");
             idx++;
         }
+
+        Console.ReadKey();
     }
 }
