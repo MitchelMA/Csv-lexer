@@ -30,6 +30,8 @@ internal static class Program
         FileInfo info = new(PathHelper.ToAbsoluteDomain(TargetFile));
 
         CsvLexer lexer = new CsvLexer(info, CsvSettings);
+        lexer.Test();
+        return;
 
         var stopwatch = Stopwatch.StartNew();
         var vals = lexer.Lex();

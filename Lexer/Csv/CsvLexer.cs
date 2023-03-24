@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Lexer.Csv.Streams;
+﻿using Lexer.Csv.Streams;
 
 namespace Lexer.Csv;
 
@@ -64,6 +63,14 @@ public class CsvLexer : IDisposable
 
         _header = splitter.Header;
         return _splits;
+    }
+
+    public void Test()
+    {
+        Console.WriteLine("Testing to convert from string value `33` to int");
+        // int value = Deserialization.Converter.ConvertTo<int>("33");
+        object value = Deserialization.Converter.ConvertToType(typeof(int), "33");
+        Console.WriteLine(value);
     }
 
     public Task<string[][]> LexAsync()
