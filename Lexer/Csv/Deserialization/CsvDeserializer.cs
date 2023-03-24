@@ -50,18 +50,21 @@ internal static class CsvDeserializer
     private static Dictionary<string, Type> GetCorTypes(PropertyInfo[] props, string[] headers)
     {
         Dictionary<string, Type> dict = new();
+        List<string> headersL = headers.ToList();
         int l = props.Length;
+        
         for (int i = 0; i < l; i++)
         {
             var cur = props[i];
             var curAttr = cur.GetCustomAttribute<CsvPropertyNameAttribute>()!;
 
-            bool isIn = headers.Contains(cur.Name);
+            int propIdx = headersL.IndexOf(cur.Name);
             if (curAttr.Name is not null)
-                isIn |= headers.Contains(curAttr.Name);
+                propIdx = propIdx is -1 ? headersL.IndexOf(curAttr.Name) : propIdx;
 
-            if (isIn)
-                dict.Add(cur.Name, cur.PropertyType);
+
+            if (propIdx != -1)
+                dict.Add(props[propIdx].Name, props[propIdx].PropertyType);
         }
 
         return dict;
