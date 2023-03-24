@@ -4,10 +4,10 @@ namespace Implementation.Models;
 
 public class BigModel
 {
-   [CsvPropertyName("date")] 
-   public DateTime Date { get; init; }
    [CsvPropertyName("cases")]
    public long Cases { get; init; }
+   [CsvPropertyName("date")] 
+   public DateTime Date { get; init; }
    [CsvPropertyName("deaths")]
    public long Deaths { get; init; }
 
