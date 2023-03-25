@@ -75,6 +75,13 @@ public class CsvLexer : IDisposable
         return CsvDeserializer.Deserialize<T>(_header!, _splits!);
     }
 
+    public T[] Deserialize<T>(string[] headers, bool ignoreFirst = false) where T : new()
+    {
+        Lex();
+        string[][] splits = ignoreFirst ? _splits!.Skip(2).ToArray() : _splits!;
+        return CsvDeserializer.Deserialize<T>(headers, splits);
+    }
+
     public Task<string[][]> LexAsync()
     {
         return Task.Run(Lex);
@@ -83,6 +90,11 @@ public class CsvLexer : IDisposable
     public Task<T[]> DeserializeAsync<T>() where T : new()
     {
         return Task.Run(Deserialize<T>);
+    }
+
+    public Task<T[]> DeserializeAsync<T>(string[] headers, bool ignoreFirst = false) where T : new()
+    {
+        return Task.Run(() => Deserialize<T>(headers, ignoreFirst));
     }
 
     #region IDisposable pattern

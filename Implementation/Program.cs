@@ -90,9 +90,14 @@ internal static class Program
                     break;
             }
 
+            int innerIdx = 0;
             foreach (var value in model)
             {
+                if (innerIdx >= 9)
+                    break;
+                
                 Console.WriteLine($"{value}\n");
+                innerIdx++;
             }
 
             Console.WriteLine("------------------------\n");
