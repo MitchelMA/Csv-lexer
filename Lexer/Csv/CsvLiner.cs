@@ -45,7 +45,7 @@ internal class CsvLiner
 
     private bool _EOLProc()
     {
-        string trimmed = _lineBuffer.ToString();
+        string trimmed = _lineBuffer.ToString().Trim();
         if (_settings.Patches && trimmed.Length == 0)
             return false;
 
@@ -73,8 +73,7 @@ internal class CsvLiner
                     _EOLProc();
                     continue;
                 default:
-                    if (_lastChar is not ' ' and not '\r')
-                        _lineBuffer.Append((char)_lastChar);
+                    _lineBuffer.Append((char)_lastChar);
                     break;
             }
         }

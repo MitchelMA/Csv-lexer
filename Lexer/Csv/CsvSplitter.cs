@@ -95,7 +95,7 @@ internal class CsvSplitter : IDisposable
 
     private void _EOSProc()
     {
-        string trimmed = _splitBuffer.ToString();
+        string trimmed = _splitBuffer.ToString().Trim();
         _lineSplits.Add(trimmed.Length > 0 ? trimmed : null!);
         _splitBuffer.Clear();
     }
@@ -116,8 +116,7 @@ internal class CsvSplitter : IDisposable
                 continue;
             }
 
-            if (_lastChar is not ' ' and not '\r')
-                _splitBuffer.Append((char)_lastChar);
+            _splitBuffer.Append((char)_lastChar);
         }
 
         _EOSProc();
