@@ -35,7 +35,7 @@ internal static class CsvDeserializer
         {
             string[] missing = GetMissingMembers(headers, csvProps);
             string missingJ = string.Join(", ", missing);
-            throw new Exception(
+            throw new MissingMemberException(
                 $"Target type does not include property for every header value.\nMissing properties for header-values: `{missingJ}`");
         }
 
@@ -79,7 +79,7 @@ internal static class CsvDeserializer
                 keys.Add(curAttr.Name);
                 continue;
             }
-            
+
             keys.Add(cur.Name);
         }
 
@@ -91,7 +91,7 @@ internal static class CsvDeserializer
         Dictionary<string, Type> dict = new();
         Span<string> headersL = headers;
         int l = props.Length;
-        
+
         for (int i = 0; i < l; i++)
         {
             var cur = props[i];
