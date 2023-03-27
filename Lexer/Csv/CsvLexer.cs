@@ -1,4 +1,5 @@
-﻿using Lexer.Csv.Deserialization;
+﻿using System.Runtime.InteropServices;
+using Lexer.Csv.Deserialization;
 using Lexer.Csv.Streams;
 
 namespace Lexer.Csv;
@@ -44,6 +45,12 @@ public class CsvLexer : IDisposable
         _settings = settings;
     }
 
+    [DllImport("Dll1.dll")]
+    public static extern IntPtr Create(int x);
+
+    [DllImport("Dll1.dll")]
+    public static extern int GetX(IntPtr t);
+    
     private string[] GetLines()
     {
         CsvLiner liner = new(_sStream, _settings);

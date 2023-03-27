@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Implementation.Models;
 using Lexer.Csv;
 using Lexer.Helpers;
@@ -23,8 +24,16 @@ internal static class Program
         FirstIsHeader = true,
     };
 
+    [DllImport("Dll1.dll")]
+    private static extern void Test(string charArr);
+
     internal static void Main(string[] args)
     {
+        IntPtr val = CsvLexer.Create(10);
+        Console.WriteLine(CsvLexer.GetX(val));
+        Test("string as char-array");
+        return;
+        
         int idx = 0;
         foreach (var fileName in Files)
         {
