@@ -8,7 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Dll1\Dll1.vcxproj" />
       <ProjectReference Include="..\Lexer\Lexer.csproj" />
     </ItemGroup>
 
@@ -16,6 +15,12 @@
       <None Update="csv\**">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Dll1">
+        <HintPath>..\x64\Release\Dll1.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>
