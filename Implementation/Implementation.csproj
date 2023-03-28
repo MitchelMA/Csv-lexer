@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Dll1\Dll1.vcxproj" />
       <ProjectReference Include="..\Lexer\Lexer.csproj" />
     </ItemGroup>
 
