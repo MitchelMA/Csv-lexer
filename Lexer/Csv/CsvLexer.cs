@@ -72,14 +72,18 @@ public class CsvLexer : IDisposable
             throw new Exception("FirstIsHeader needs to be set to `True` in the settings for deserialization");
 
         Lex();
-        return CsvDeserializer.Deserialize<T>(_header!, _splits!);
+        CsvDeserializer<T> deserializer = new(_header!, _splits!);
+        return deserializer.Deserialize();
     }
 
     public T[] Deserialize<T>(string[] headers, bool ignoreFirst = false) where T : new()
     {
         Lex();
         string[][] splits = ignoreFirst ? _splits!.Skip(2).ToArray() : _splits!;
-        return CsvDeserializer.Deserialize<T>(headers, splits);
+
+        CsvDeserializer<T> deserializer = new(headers, splits);
+
+        return deserializer.Deserialize();
     }
 
     public Task<string[][]> LexAsync()
