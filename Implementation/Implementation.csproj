@@ -19,7 +19,7 @@
 
     <ItemGroup>
       <Reference Include="Dll1">
-        <HintPath>..\x64\Release\Dll1.dll</HintPath>
+        <HintPath>..\Dll1\DllOutput\Dll1.dll</HintPath>
       </Reference>
     </ItemGroup>
 

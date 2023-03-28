@@ -395,6 +395,9 @@ FodyWeavers.xsd
 *.msm
 *.msp
 
+# Compiled dll's folder
+DllOutput/
+
 # JetBrains Rider
 *.sln.iml
 .idea
