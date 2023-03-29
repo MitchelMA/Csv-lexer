@@ -47,6 +47,8 @@ internal class StrippedStream : IDisposable
 
     internal void Reset()
     {
+        _lastValue = 0;
+        _nextValue = 0;
         _bytes.Reset();
     }
 
