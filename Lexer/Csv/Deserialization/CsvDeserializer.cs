@@ -4,125 +4,155 @@ using Lexer.Csv.Attributes;
 
 namespace Lexer.Csv.Deserialization;
 
-internal static class CsvDeserializer
+internal class CsvDeserializer<T> where T : new()
 {
     private const BindingFlags Binds = BindingFlags.Instance | BindingFlags.Public;
 
-    internal static T[] Deserialize<T>(string[] headers, string[][] csvValues) where T : new()
+    private readonly (PropertyInfo propInfo, CsvPropertyNameAttribute custAttr)[] _csvProps;
+    private readonly Dictionary<string, Type> _typeMap;
+    private readonly Type _tType;
+
+    private string[] _headers;
+    private string[][] _values;
+
+    /// <summary>
+    /// Creates a new instance of a CsvDeserializer for Generic T
+    /// </summary>
+    /// <param name="headers">The header values of the csv file</param>
+    /// <param name="values">The comma-seperated-values of the csv excluding the header</param>
+    /// <exception cref="SerializationException">
+    /// When no properties with the attribute CsvPropertyName are in the target type
+    /// </exception>
+    /// <exception cref="MissingMemberException">
+    /// When there is a missing property for a header value
+    /// </exception>
+    internal CsvDeserializer(string[] headers, string[][] values)
     {
-        T[] ts = new T[csvValues.Length];
+        _headers = headers;
+        _values = values;
+
+        _tType = typeof(T);
+        _csvProps = GetCsvProps();
+        _typeMap = GetTypeMap();
+
+        if (_csvProps.Length is 0)
+            throw new SerializationException(
+                $"No properties with {nameof(CsvPropertyNameAttribute)} found on target type `{typeof(T).FullName}`");
+
+        if (_typeMap.Count != _csvProps.Length)
+        {
+            string[] missing = GetMissingMembers();
+            string missingJ = string.Join(", ", missing);
+            throw new MissingMemberException(
+                $"Target type does not include property for every header value.\nMissing properties for header-values: `{missingJ}`");
+        }
+    }
+
+    internal T[] Deserialize()
+    {
+        T[] ts = new T[_values.Length];
         int l = ts.Length;
         for (int i = 0; i < l; i++)
         {
-            ts[i] = DeserializeLine<T>(headers, csvValues[i]);
+            ts[i] = DeserializeLine(_values[i]);
         }
 
         return ts;
     }
 
-    private static T DeserializeLine<T>(string[] headers, string[] lineValues) where T : new()
+    private T DeserializeLine(string[] lineValues)
     {
-        PropertyInfo[] csvProps = GetCsvProps<T>();
-        if (csvProps.Length is 0)
-            throw new SerializationException(
-                $"No properties with {nameof(CsvPropertyNameAttribute)} found on target type `{typeof(T).FullName}`");
-
         object inst = new T();
-        Type instT = inst.GetType();
-        Dictionary<string, Type> types = GetCorTypes(csvProps, headers);
-
-        if (types.Count != csvProps.Length)
+        Span<KeyValuePair<string, Type>> typeMapS = _typeMap.ToArray();
+        int l = typeMapS.Length;
+        for (int i = 0; i < l; i++)
         {
-            string[] missing = GetMissingMembers(headers, csvProps);
-            string missingJ = string.Join(", ", missing);
-            throw new MissingMemberException(
-                $"Target type does not include property for every header value.\nMissing properties for header-values: `{missingJ}`");
-        }
+            var cur = typeMapS[i];
 
-        int idx = 0;
-        foreach (var type in types)
-        {
-            object converted = Converter.ConvertToType(type.Value, lineValues[idx]);
-            instT.InvokeMember(type.Key, Binds | BindingFlags.SetProperty, Type.DefaultBinder, inst,
+            object converted = Converter.ConvertToType(cur.Value, lineValues[i]);
+            _tType.InvokeMember(cur.Key, Binds | BindingFlags.SetProperty, Type.DefaultBinder, inst,
                 new[] { converted });
-
-            idx++;
         }
 
         return (T)inst;
     }
 
-    private static string[] GetMissingMembers(string[] headers, PropertyInfo[] props)
-    {
-        List<string> missing = new();
-        Span<string> keyList = GetHeaderKeys(props);
-        int l = headers.Length;
-        for (int i = 0; i < l; i++)
-        {
-            if (!keyList.Contains(headers[i]))
-                missing.Add(headers[i]);
-        }
 
-        return missing.ToArray();
-    }
-
-    private static string[] GetHeaderKeys(PropertyInfo[] props)
-    {
-        List<string> keys = new();
-        int l = props.Length;
-        for (int i = 0; i < l; i++)
-        {
-            var cur = props[i];
-            var curAttr = cur.GetCustomAttribute<CsvPropertyNameAttribute>()!;
-            if (curAttr.Name is not null)
-            {
-                keys.Add(curAttr.Name);
-                continue;
-            }
-
-            keys.Add(cur.Name);
-        }
-
-        return keys.ToArray();
-    }
-
-    private static Dictionary<string, Type> GetCorTypes(PropertyInfo[] props, string[] headers)
+    private Dictionary<string, Type> GetTypeMap()
     {
         Dictionary<string, Type> dict = new();
-        Span<string> headersL = headers;
-        int l = props.Length;
+        Span<string> headersL = _headers;
+        int l = _csvProps.Length;
 
         for (int i = 0; i < l; i++)
         {
-            var cur = props[i];
-            var curAttr = cur.GetCustomAttribute<CsvPropertyNameAttribute>()!;
+            var cur = _csvProps[i];
 
-            int propIdx = headersL.IndexOf(cur.Name);
-            if (curAttr.Name is not null)
-                propIdx = propIdx is -1 ? headersL.IndexOf(curAttr.Name) : propIdx;
+            int propIdx = headersL.IndexOf(cur.propInfo.Name);
+            if (cur.custAttr.Name is not null)
+                propIdx = propIdx is -1 ? headersL.IndexOf(cur.custAttr.Name) : propIdx;
 
 
-            if (propIdx != -1 && propIdx < props.Length)
-                dict.Add(props[propIdx].Name, props[propIdx].PropertyType);
+            if (propIdx != -1 && propIdx < _csvProps.Length)
+                dict.Add(_csvProps[propIdx].propInfo.Name, _csvProps[propIdx].propInfo.PropertyType);
         }
 
         return dict;
     }
 
-    private static PropertyInfo[] GetCsvProps<T>()
+    private (PropertyInfo, CsvPropertyNameAttribute)[] GetCsvProps()
     {
-        List<PropertyInfo> props = new();
-        Span<PropertyInfo> all = typeof(T).GetProperties(Binds);
+        List<(PropertyInfo, CsvPropertyNameAttribute)> props = new();
+        Span<PropertyInfo> all = _tType.GetProperties(Binds);
 
         int l = all.Length;
 
         for (int i = 0; i < l; i++)
         {
             var cur = all[i];
-            if (cur.GetCustomAttribute<CsvPropertyNameAttribute>() is not null)
-                props.Add(cur);
+            var attr = cur.GetCustomAttribute<CsvPropertyNameAttribute>();
+            if (attr is not null)
+                props.Add((cur, attr));
         }
 
         return props.ToArray();
     }
+
+    #region MissingHeaderFinding
+
+    private string[] GetMissingMembers()
+    {
+        List<string> missing = new();
+        Span<string> keyList = GetHeaderKeys();
+        int l = _headers.Length;
+        for (int i = 0; i < l; i++)
+        {
+            if (!keyList.Contains(_headers[i]))
+                missing.Add(_headers[i]);
+        }
+
+        return missing.ToArray();
+    }
+
+    private string[] GetHeaderKeys()
+    {
+        Span<(PropertyInfo, CsvPropertyNameAttribute)> csvPropsS = _csvProps;
+        List<string> keys = new();
+        int l = csvPropsS.Length;
+        for (int i = 0; i < l; i++)
+        {
+            var cur = csvPropsS[i];
+            if (cur.Item2.Name is not null)
+            {
+                keys.Add(cur.Item2.Name);
+                continue;
+            }
+
+            keys.Add(cur.Item1.Name);
+        }
+
+        return keys.ToArray();
+    }
+
+    #endregion // MissingHeaderFinding
 }
