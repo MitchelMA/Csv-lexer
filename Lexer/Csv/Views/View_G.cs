@@ -2,20 +2,67 @@
 
 public class View<T> : View
 {
-    internal new readonly T[] Values;
-
-    public View(T[] values, int startIdx, int length) : base((values as object[])!, startIdx, length)
+    internal readonly T[] Values;
+    public int StartIdx
     {
-        Values = values;
+        get => PStartIdx;
+        set
+        {
+            if (value > Values.Length - 1)
+            {
+                PStartIdx = Values.Length - 1;
+                return;
+            }
+
+            int diff = value - PStartIdx;
+            PStartIdx = value;
+            PLen -= diff;
+        }
+    }
+    public int Length
+    {
+        get => PLen;
+        set
+        {
+            if (value == -1 || PStartIdx + value > Values.Length)
+            {
+                PLen = Values.Length - PStartIdx;
+                return;
+            }
+
+            if (value <= 0)
+            {
+                PLen = 1;
+                return;
+            }
+
+            PLen = value;
+        }
     }
 
-    public View(T[] values, int startIdx) : base((values as object[])!, startIdx)
+    public View(T[] values, int startIdx, int length)
     {
         Values = values;
+        StartIdx = startIdx;
+        Length = length;
+        Console.WriteLine(values.GetHashCode());
     }
 
-    public View(T[] values) : base((values as object[])!)
+    public View(T[] values, int startIdx)
     {
         Values = values;
+        StartIdx = startIdx;
+        PLen = values.Length;
     }
+
+    public View(T[] values)
+    {
+        Values = values;
+        PStartIdx = 0;
+        PLen = Values.Length;
+    }
+
+    public IReadOnlyList<T> GetValues() =>
+        Values.AsReadOnly();
+    
 }

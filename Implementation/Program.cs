@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text;
 using Implementation.Models;
 using Lexer.Csv;
 using Lexer.Csv.Views;
@@ -113,21 +114,22 @@ internal static class Program
     {
         string txt = "dit is een hele mooie string";
         string test = "dit is een hele mooie string";
-        string smoll = "  dit  ";
+        string smoll = "  dit   Zeker mooi  ";
+        char[] smollC = smoll.ToCharArray();
         Console.WriteLine(txt.GetHashCode());
         Console.WriteLine(test.GetHashCode());
+
+        StringView view = new(smollC, 0, 7);
+        StringView view2 = new(smollC, 6, -1);
+        view.Trim();
+        view2.Trim();
+        string output = view;
+        string output2 = view2;
         
-        StringView view = new(smoll)
-        {
-            StartIdx = 0,
-            Length = 0,
-        };
-        // view.Trim();
-        string output = view.ToString();
-        string txt2 = view.ToString();
         Console.WriteLine($":{output}:");
+        Console.WriteLine($":{output2}:");
         Console.WriteLine(output.GetHashCode());
-        Console.WriteLine(txt2.GetHashCode());
+        Console.WriteLine(output2.GetHashCode());
         
     }
 }

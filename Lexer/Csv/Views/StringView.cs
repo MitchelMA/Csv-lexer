@@ -1,72 +1,42 @@
 ﻿namespace Lexer.Csv.Views;
 
-public struct StringView
+public class StringView : View<char>
 {
-    internal readonly string Str;
-    private int _startIdx;
-    private int _len;
+    private string? _out;
 
-    private string? _output;
-
-    public string Reference => Str;
-    public int StartIdx
+    public StringView(string values, int startIdx, int length) : base(values.ToCharArray(), startIdx, length)
     {
-        get => _startIdx;
-        set
-        {
-            if (value > Str.Length - 1)
-                return;
-
-            int diff = value - _startIdx;
-            _startIdx = value;
-            _len -= diff;
-        }
-    }
-    public int Length
-    {
-        get => _len;
-        set
-        {
-            if (value <= 0)
-                return;
-
-            if (_startIdx + value > Str.Length)
-                return;
-
-            _len = value;
-        }
-    }
-    public int EndIdx => _startIdx + _len - 1;
-    
-    public StringView(string str, int startIdx, int len)
-    {
-        Str = str;
-        _startIdx = startIdx;
-        _len = len;
     }
 
-    public StringView(string str, int startIdx)
+    public StringView(string values, int startIdx) : base(values.ToCharArray(), startIdx)
     {
-        Str = str;
-        _startIdx = startIdx;
-        _len = Str.Length - _startIdx;
     }
 
-    public StringView(string str)
+    public StringView(string values) : base(values.ToCharArray())
     {
-        Str = str;
-        _startIdx = 0;
-        _len = Str.Length;
+    }
+
+    public StringView(char[] values, int startIdx, int length) : base(values, startIdx, length)
+    {
+    }
+
+    public StringView(char[] values, int startIdx) : base(values, startIdx)
+    {
+    }
+
+    public StringView(char[] values) : base(values)
+    {
     }
 
     public override string ToString() =>
-        _output ??= Str.Substring(_startIdx, _len);
+        _out ??= new(Values, StartIdx, Length);
 
     public void TrimStart()
     {
-        for (int i = _startIdx; i < _len; i++)
+        _out = null;
+        for (int i = PStartIdx; i < PLen; i++)
         {
-            if (char.IsWhiteSpace(Str[i]))
+            if (char.IsWhiteSpace(Values[i]))
             {
                 StartIdx++;
                 continue;
@@ -78,9 +48,10 @@ public struct StringView
 
     public void TrimEnd()
     {
-        for (int i = EndIdx; i > _startIdx; i--)
+        _out = null;
+        for (int i = EndIdx; i > PStartIdx; i--)
         {
-            if (char.IsWhiteSpace(Str[i]))
+            if (char.IsWhiteSpace(Values[i]))
             {
                 Length--;
                 continue;
@@ -89,12 +60,12 @@ public struct StringView
             break;
         }
     }
-    
+
     public void Trim()
     {
-       TrimStart(); 
-       TrimEnd();
+        TrimStart();
+        TrimEnd();
     }
 
-    // public static implicit operator string(StringView sv) => sv.ToString();
+    public static implicit operator string(StringView v) => v.ToString();
 }
