@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using Implementation.Models;
 using Lexer.Csv;
+using Lexer.Csv.Views;
 using Lexer.Helpers;
 
 namespace Implementation;

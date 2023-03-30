@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-
-namespace Lexer.Csv;
+﻿namespace Lexer.Csv.Views;
 
 public struct StringView
 {
