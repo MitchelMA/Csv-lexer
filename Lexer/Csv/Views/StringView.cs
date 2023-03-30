@@ -2,8 +2,6 @@
 
 public class StringView : View<char>
 {
-    private string? _out;
-
     public StringView(string values, int startIdx, int length) : base(values.ToCharArray(), startIdx, length)
     {
     }
@@ -29,11 +27,10 @@ public class StringView : View<char>
     }
 
     public override string ToString() =>
-        _out ??= new(Values, StartIdx, Length);
+        new(Values, StartIdx, Length);
 
     public void TrimStart()
     {
-        _out = null;
         for (int i = PStartIdx; i < PLen; i++)
         {
             if (char.IsWhiteSpace(Values[i]))
@@ -48,7 +45,6 @@ public class StringView : View<char>
 
     public void TrimEnd()
     {
-        _out = null;
         for (int i = EndIdx; i > PStartIdx; i--)
         {
             if (char.IsWhiteSpace(Values[i]))

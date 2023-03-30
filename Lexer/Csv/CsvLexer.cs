@@ -1,5 +1,6 @@
 ﻿using Lexer.Csv.Deserialization;
 using Lexer.Csv.Streams;
+using Lexer.Csv.Views;
 
 namespace Lexer.Csv;
 
@@ -99,6 +100,23 @@ public class CsvLexer : IDisposable
     public Task<T[]> DeserializeAsync<T>(string[] headers, bool ignoreFirst = false) where T : new()
     {
         return Task.Run(() => Deserialize<T>(headers, ignoreFirst));
+    }
+
+    public static ByteView[] Test(byte[] bytes)
+    {
+        List<ByteView> snapShots = new();
+        ByteViewStream bvs = new(bytes);
+        while (bvs.Skip() == false)
+        {
+            for (int i = 0; i < 4; i++)
+                if (bvs.Consume() == -1)
+                    break;
+            
+            snapShots.Add(bvs.SnapShot());
+        }
+        
+        Console.WriteLine((char)bvs.Peek());
+        return snapShots.ToArray();
     }
 
     #region IDisposable pattern

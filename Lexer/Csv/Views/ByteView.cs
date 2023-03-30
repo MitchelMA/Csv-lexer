@@ -4,8 +4,6 @@ namespace Lexer.Csv.Views;
 
 public class ByteView : View<byte>
 {
-    private string? _out;
-    
     public ByteView(byte[] values, int startIdx, int length) : base(values, startIdx, length)
     {
     }
@@ -19,11 +17,10 @@ public class ByteView : View<byte>
     }
 
     public override string ToString() =>
-       _out ??=  Encoding.Default.GetString(Values, StartIdx, Length);
+       Encoding.Default.GetString(Values, StartIdx, Length);
 
     public void TrimStart()
     {
-        _out = null;
         for (int i = PStartIdx; i < PLen; i++)
         {
             char ch = (char)Values[i];
@@ -39,7 +36,6 @@ public class ByteView : View<byte>
 
     public void TrimEnd()
     {
-        _out = null;
         for (int i = EndIdx; i > PStartIdx; i--)
         {
             char ch = (char)Values[i];

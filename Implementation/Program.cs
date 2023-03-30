@@ -113,11 +113,11 @@ internal static class Program
     internal static void Main(string[] args)
     {
         string txt = "dit is een hele mooie string";
-        string test = "dit is een hele mooie string";
-        string smoll = "  dit   Zeker mooi  ";
+        string smoll = "prachtige text, niet?";
         char[] smollC = smoll.ToCharArray();
+        byte[] smollB = Encoding.Default.GetBytes(smoll);
+        Console.WriteLine(smollB.GetHashCode());
         Console.WriteLine(txt.GetHashCode());
-        Console.WriteLine(test.GetHashCode());
 
         StringView view = new(smollC, 0, 7);
         StringView view2 = new(smollC, 6, -1);
@@ -130,6 +130,10 @@ internal static class Program
         Console.WriteLine($":{output2}:");
         Console.WriteLine(output.GetHashCode());
         Console.WriteLine(output2.GetHashCode());
-        
+
+        ByteView[] bv = CsvLexer.Test(smollB);
+        foreach(var val in bv)
+            Console.WriteLine(val);
+        Console.WriteLine("end");
     }
 }

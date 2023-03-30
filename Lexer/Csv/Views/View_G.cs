@@ -30,9 +30,9 @@ public class View<T> : View
                 return;
             }
 
-            if (value <= 0)
+            if (value < 0)
             {
-                PLen = 1;
+                PLen = 0;
                 return;
             }
 
@@ -45,7 +45,6 @@ public class View<T> : View
         Values = values;
         StartIdx = startIdx;
         Length = length;
-        Console.WriteLine(values.GetHashCode());
     }
 
     public View(T[] values, int startIdx)
