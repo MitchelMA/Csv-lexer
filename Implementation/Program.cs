@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Implementation.Models;
 using Lexer.Csv;
 using Lexer.Helpers;
@@ -23,7 +24,7 @@ internal static class Program
         FirstIsHeader = true,
     };
 
-    internal static void Main(string[] args)
+    internal static void Main2(string[] args)
     {
         int idx = 0;
         foreach (var fileName in Files)
@@ -105,5 +106,23 @@ internal static class Program
         }
 
         Console.ReadKey();
+    }
+
+    internal static void Main(string[] args)
+    {
+        string txt = "dit is een hele mooie string";
+        string test = "dit is een hele mooie string";
+        string smoll = "  dit  ";
+        Console.WriteLine(txt.GetHashCode());
+        Console.WriteLine(test.GetHashCode());
+        
+        StringView view = new(smoll);
+        view.Trim();
+        string output = view.ToString();
+        string txt2 = view.ToString();
+        Console.WriteLine($":{output}:");
+        Console.WriteLine(output.GetHashCode());
+        Console.WriteLine(txt2.GetHashCode());
+        
     }
 }
