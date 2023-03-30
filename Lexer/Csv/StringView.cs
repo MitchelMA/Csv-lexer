@@ -4,66 +4,98 @@ namespace Lexer.Csv;
 
 public struct StringView
 {
-    private string _str;
+    internal readonly string Str;
     private int _startIdx;
     private int _len;
 
     private string? _output;
 
+    public string Reference => Str;
+    public int StartIdx
+    {
+        get => _startIdx;
+        set
+        {
+            if (value > Str.Length - 1)
+                return;
+
+            int diff = value - _startIdx;
+            _startIdx = value;
+            _len -= diff;
+        }
+    }
+    public int Length
+    {
+        get => _len;
+        set
+        {
+            if (value <= 0)
+                return;
+
+            if (_startIdx + value > Str.Length)
+                return;
+
+            _len = value;
+        }
+    }
+    public int EndIdx => _startIdx + _len - 1;
+    
     public StringView(string str, int startIdx, int len)
     {
-        _str = str;
+        Str = str;
         _startIdx = startIdx;
         _len = len;
     }
 
     public StringView(string str, int startIdx)
     {
-        _str = str;
+        Str = str;
         _startIdx = startIdx;
-        _len = _str.Length - _startIdx;
+        _len = Str.Length - _startIdx;
     }
 
     public StringView(string str)
     {
-        _str = str;
+        Str = str;
         _startIdx = 0;
-        _len = _str.Length;
+        _len = Str.Length;
     }
 
     public override string ToString() =>
-        _output ??= _str.Substring(_startIdx, _len);
+        _output ??= Str.Substring(_startIdx, _len);
 
+    public void TrimStart()
+    {
+        for (int i = _startIdx; i < _len; i++)
+        {
+            if (char.IsWhiteSpace(Str[i]))
+            {
+                StartIdx++;
+                continue;
+            }
+
+            break;
+        }
+    }
+
+    public void TrimEnd()
+    {
+        for (int i = EndIdx; i > _startIdx; i--)
+        {
+            if (char.IsWhiteSpace(Str[i]))
+            {
+                Length--;
+                continue;
+            }
+
+            break;
+        }
+    }
+    
     public void Trim()
     {
-        int startIdx = _startIdx;
-        int len = _len;
-
-        for (int i = startIdx; i < len; i++)
-        {
-            if (char.IsWhiteSpace(_str[i]))
-            {
-                startIdx++;
-                len--;
-                continue;
-            }
-
-            break;
-        }
-
-        for (int i = startIdx + len-1; i > startIdx; i--)
-        {
-            if (char.IsWhiteSpace(_str[i]))
-            {
-                len--;
-                continue;
-            }
-
-            break;
-        }
-
-        _startIdx = startIdx;
-        _len = len;
+       TrimStart(); 
+       TrimEnd();
     }
 
     // public static implicit operator string(StringView sv) => sv.ToString();

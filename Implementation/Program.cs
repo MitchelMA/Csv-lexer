@@ -116,8 +116,12 @@ internal static class Program
         Console.WriteLine(txt.GetHashCode());
         Console.WriteLine(test.GetHashCode());
         
-        StringView view = new(smoll);
-        view.Trim();
+        StringView view = new(smoll)
+        {
+            StartIdx = 0,
+            Length = 0,
+        };
+        // view.Trim();
         string output = view.ToString();
         string txt2 = view.ToString();
         Console.WriteLine($":{output}:");
