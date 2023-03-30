@@ -51,7 +51,7 @@ public class View<T> : View
     {
         Values = values;
         StartIdx = startIdx;
-        PLen = values.Length;
+        PLen = values.Length - startIdx;
     }
 
     public View(T[] values)
