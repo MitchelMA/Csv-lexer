@@ -6,10 +6,46 @@ namespace Lexer.Csv.Streams;
 internal class ByteViewStream
 {
     private ByteView _view;
-    private int _value;
+    private int _capacity;
 
+    internal int Length
+    {
+        get => _view.Length;
+        set
+        {
+            if (value > _capacity)
+            {
+                _view.Length = _capacity;
+                return;
+            }
+
+            _view.Length = value;
+        }
+    }
+    internal int Capacity
+    {
+        get => _capacity;
+        set
+        {
+            if (value == -1 || _view.StartIdx + value > _view.Values.Length)
+            {
+                _capacity = _view.Values.Length - _view.StartIdx;
+                return;
+            }
+
+            if (value < -1)
+            {
+                _capacity = 0;
+                return;
+            }
+
+            _capacity = value;
+        }
+    }
     internal int Position => _view.StartIdx + _view.Length;
 
+    internal int AbsCapacityPos => _view.StartIdx + Capacity;
+    
     internal ByteViewStream(byte[] bytes)
     {
         _view = new(bytes, 0, 0);
@@ -31,24 +67,24 @@ internal class ByteViewStream
     /// </returns>
     internal bool Skip()
     {
-        _view.StartIdx += _view.Length;
+        _view.StartIdx += Length;
         return _view.StartIdx + _view.Length == _view.Values.Length;
     }
 
     internal int Consume()
     {
-        if (Position > _view.Values.Length - 1)
+        if (Position > AbsCapacityPos - 1)
             return -1;
         
-        _value = _view.Values[Position];
-        _view.Length++;
+        var value = _view.Values[Position];
+        Length++;
 
-        return _value;
+        return value;
     }
 
     internal int Peek()
     {
-        if (Position > _view.Values.Length - 1)
+        if (Position > AbsCapacityPos - 1)
             return -1;
         
         return _view.Values[Position];

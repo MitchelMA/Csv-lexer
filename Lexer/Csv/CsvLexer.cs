@@ -119,6 +119,11 @@ public class CsvLexer : IDisposable
         return snapShots.ToArray();
     }
 
+    public static void Test2()
+    {
+        string txt = "dit is een stukje tekst";
+    }
+
     #region IDisposable pattern
 
     private void ReleaseManagedResources()
