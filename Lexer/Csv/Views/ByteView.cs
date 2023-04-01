@@ -4,6 +4,10 @@ namespace Lexer.Csv.Views;
 
 public class ByteView : View<byte>
 {
+    public ByteView(byte[] values, int startIdx, int length, HashSet<int> skips) : base(values, startIdx, length, skips)
+    {
+    }
+    
     public ByteView(byte[] values, int startIdx, int length) : base(values, startIdx, length)
     {
     }

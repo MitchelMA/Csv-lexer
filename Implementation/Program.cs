@@ -114,26 +114,9 @@ internal static class Program
     {
         string txt = "dit is een hele mooie string";
         string smoll = "prachtige text, niet?";
-        char[] smollC = smoll.ToCharArray();
         byte[] smollB = Encoding.Default.GetBytes(smoll);
-        Console.WriteLine(smollB.GetHashCode());
-        Console.WriteLine(txt.GetHashCode());
 
-        StringView view = new(smollC, 0, 7);
-        StringView view2 = new(smollC, 6, -1);
-        view.Trim();
-        view2.Trim();
-        string output = view;
-        string output2 = view2;
-        
-        Console.WriteLine($":{output}:");
-        Console.WriteLine($":{output2}:");
-        Console.WriteLine(output.GetHashCode());
-        Console.WriteLine(output2.GetHashCode());
-
-        ByteView[] bv = CsvLexer.Test(smollB);
-        foreach(var val in bv)
-            Console.WriteLine(val);
-        Console.WriteLine("end");
+        ByteView bv = CsvLexer.Test2(smollB);
+        Console.WriteLine(bv);
     }
 }

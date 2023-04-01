@@ -49,13 +49,20 @@ internal class ByteViewStream
     internal ByteViewStream(byte[] bytes)
     {
         _view = new(bytes, 0, 0);
+        _capacity = _view.Values.Length;
     }
 
     internal ByteViewStream(string text) : this(Encoding.UTF8.GetBytes(text))
     {
     }
 
-    internal ByteView SnapShot() =>
+    internal ByteViewStream(ByteView bv)
+    {
+        _view = new(bv.Values, bv.StartIdx, 0, bv.SkippedIndices);
+        _capacity = bv.Length;
+    }
+
+    internal ByteView Capture() =>
         new(_view.Values, _view.StartIdx, _view.Length);
 
     /// <summary>
@@ -73,7 +80,7 @@ internal class ByteViewStream
 
     internal int Consume()
     {
-        if (Position > AbsCapacityPos - 1)
+        if (Position > AbsCapacityPos - 1 || Position > _view.Values.Length - 1)
             return -1;
         
         var value = _view.Values[Position];
@@ -84,7 +91,7 @@ internal class ByteViewStream
 
     internal int Peek()
     {
-        if (Position > AbsCapacityPos - 1)
+        if (Position > AbsCapacityPos - 1 || Position > _view.Values.Length - 1)
             return -1;
         
         return _view.Values[Position];

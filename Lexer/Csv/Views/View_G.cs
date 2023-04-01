@@ -40,6 +40,13 @@ public class View<T> : View
         }
     }
 
+    public View(T[] values, int startIdx, int length, HashSet<int> skips) : base(skips)
+    {
+        Values = values;
+        StartIdx = startIdx;
+        Length = length;
+    }
+
     public View(T[] values, int startIdx, int length)
     {
         Values = values;

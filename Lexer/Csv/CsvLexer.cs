@@ -112,16 +112,25 @@ public class CsvLexer : IDisposable
                 if (bvs.Consume() == -1)
                     break;
             
-            snapShots.Add(bvs.SnapShot());
+            snapShots.Add(bvs.Capture());
         }
         
         Console.WriteLine((char)bvs.Peek());
         return snapShots.ToArray();
     }
 
-    public static void Test2()
+    public static ByteView Test2(byte[] bytes)
     {
-        string txt = "dit is een stukje tekst";
+        ByteViewStream bvs = new(bytes);
+        while (bvs.Consume() != -1) ;
+        return bvs.Capture();
+    }
+
+    public static ByteView Test3(ByteView bv)
+    {
+        ByteViewStream bvs = new(bv);
+        while (bvs.Consume() != -1) ;
+        return bvs.Capture();
     }
 
     #region IDisposable pattern
