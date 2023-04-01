@@ -117,6 +117,8 @@ internal static class Program
         byte[] smollB = Encoding.Default.GetBytes(smoll);
 
         ByteView bv = CsvLexer.Test2(smollB);
+        bv.AddSkip(2);
+        bv.AddSkip(0);
         Console.WriteLine(bv);
     }
 }
