@@ -6,7 +6,7 @@ public class ByteView : View<byte>
 {
     private readonly StringBuilder _sb = new();
     private char[]? _asChars;
-    
+
     public ByteView(byte[] values, int startIdx, int length, HashSet<int> skips) : base(values, startIdx, length, skips)
     {
     }
@@ -26,35 +26,34 @@ public class ByteView : View<byte>
     public override string ToString()
     {
         if (SkippedIndices.Count == 0)
-            return Encoding.Default.GetString(Values, StartIdx, Length);
+            return Encoding.Default.GetString(Values, PStartIdx, PLen);
 
         _sb.Clear();
         _asChars ??= Encoding.Default.GetChars(Values);
-        
+
         Span<int> skips = SkippedIndices.Order().ToArray();
         int l = skips.Length;
         int tmpStart = PStartIdx;
-
+        int tmpLen;
         for (int i = 0; i < l; i++)
         {
-            int tmpLen = skips[i] - tmpStart;
-            int diff = tmpLen - tmpStart;
-            if (diff >= 0)
-            {
-                Collect(_sb, tmpStart, tmpLen);
-            }
+            tmpLen = skips[i] - tmpStart;
+            if(tmpLen < 0)
+                continue;
+            Collect(_sb, tmpStart, tmpLen);
 
-            tmpStart += tmpLen+1;
+            tmpStart = skips[i]+1;
         }
 
-        Collect(_sb, tmpStart, Length);
-        
+        tmpLen = PLen - tmpStart;
+        Collect(_sb, tmpStart, tmpLen + StartIdx);
+
         return _sb.ToString();
     }
 
     private void Collect(StringBuilder sb, int start, int len)
     {
-        for (int i = start; i < len; i++)
+        for (int i = start; i < start + len; i++)
         {
             sb.Append(_asChars![i]);
         }
@@ -62,7 +61,7 @@ public class ByteView : View<byte>
 
     public void TrimStart()
     {
-        for (int i = PStartIdx; i < PLen; i++)
+        for (int i = PStartIdx; i < PStartIdx + PLen; i++)
         {
             char ch = (char)Values[i];
             if (char.IsWhiteSpace(ch))

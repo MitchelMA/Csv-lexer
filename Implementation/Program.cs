@@ -113,12 +113,22 @@ internal static class Program
     internal static void Main(string[] args)
     {
         string txt = "dit is een hele mooie string";
-        string smoll = "prachtige text, niet?";
+        string smoll = "prachtige text, niet?   ";
         byte[] smollB = Encoding.Default.GetBytes(smoll);
 
-        ByteView bv = CsvLexer.Test2(smollB);
-        bv.AddSkip(2);
-        bv.AddSkip(0);
-        Console.WriteLine(bv);
+        ByteView bv = new(smollB)
+        {
+            StartIdx = 9
+        };
+        // dit is allemaal nummer manipulation (het creeërt geen nieuwe string)
+        bv.AddSkip(10);
+        bv.AddSkip(13);
+        // dit creeërt wel een nieuwe string
+        Console.WriteLine($":{bv}:");
+        // maar de Trim() niet
+        bv.Trim();
+        // en logischerwijs hier weer wel
+        Console.WriteLine($":{bv}:");
+        
     }
 }
