@@ -63,7 +63,7 @@ internal class ByteViewStream
     }
 
     internal ByteView Capture() =>
-        new(_view.Values, _view.StartIdx, _view.Length);
+        new(_view.Values, _view.StartIdx, _view.Length, _view.SkippedIndices);
 
     /// <summary>
     /// Skips past all the current bytes in view
@@ -75,7 +75,7 @@ internal class ByteViewStream
     internal bool Skip()
     {
         _view.StartIdx += Length;
-        return _view.StartIdx + _view.Length == _view.Values.Length;
+        return _view.StartIdx + _view.Length >= _view.Values.Length;
     }
 
     internal int Consume()
@@ -96,4 +96,10 @@ internal class ByteViewStream
         
         return _view.Values[Position];
     }
+
+    internal bool AddSkidIndex(int index) =>
+        _view.AddSkip(index);
+
+    internal bool AddSkipAtCurrentPosition() =>
+        _view.AddSkip(Position);
 }

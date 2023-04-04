@@ -64,7 +64,7 @@ public class ByteView : View<byte>
         for (int i = PStartIdx; i < PStartIdx + PLen; i++)
         {
             char ch = (char)Values[i];
-            if (char.IsWhiteSpace(ch))
+            if (SkippedIndices.Contains(i) || char.IsWhiteSpace(ch))
             {
                 StartIdx++;
                 continue;
@@ -79,7 +79,7 @@ public class ByteView : View<byte>
         for (int i = EndIdx; i > PStartIdx; i--)
         {
             char ch = (char)Values[i];
-            if (char.IsWhiteSpace(ch))
+            if (SkippedIndices.Contains(i) || char.IsWhiteSpace(ch))
             {
                 Length--;
                 continue;

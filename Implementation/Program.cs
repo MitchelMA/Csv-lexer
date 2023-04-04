@@ -110,7 +110,7 @@ internal static class Program
         Console.ReadKey();
     }
 
-    internal static void Main(string[] args)
+    internal static void Main3(string[] args)
     {
         string txt = "dit is een hele mooie string";
         string smoll = "prachtige text, niet?   ";
@@ -130,5 +130,14 @@ internal static class Program
         // en logischerwijs hier weer wel
         Console.WriteLine($":{bv}:");
         
+    }
+
+    internal static void Main(string[] args)
+    {
+        FileInfo fi = new(PathHelper.ToAbsoluteDomain(Files[0]));
+        using CsvLexer lexer = new(fi, CsvSettings);
+        ByteView[] values = lexer.GetLines2();
+        foreach(var value in values)
+            Console.WriteLine(value);
     }
 }
