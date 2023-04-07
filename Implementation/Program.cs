@@ -23,7 +23,7 @@ internal static class Program
         Separator = ',',
         CommentStarter = '#',
         Patches = true,
-        FirstIsHeader = true,
+        FirstIsHeader = false,
     };
 
     internal static void Main2(string[] args)
@@ -135,10 +135,10 @@ internal static class Program
     internal static void Main(string[] args)
     {
         // FileInfo fi = new(PathHelper.ToAbsoluteDomain(@"E:\Libraries\Downloads\big.csv"));
-        FileInfo fi = new(PathHelper.ToAbsoluteDomain(Files[2]));
+        FileInfo fi = new(PathHelper.ToAbsoluteDomain(Files[3]));
         using CsvLexer lexer = new(fi, CsvSettings);
         var sw = Stopwatch.StartNew();
-        var lines = lexer.GetLines2();
+        var lines = lexer.GetLines();
         sw.Stop();
         Console.WriteLine(sw.Elapsed.TotalSeconds);
         Console.WriteLine($"{GC.GetTotalMemory(true) * 9.537E-7f}mb usage\n");

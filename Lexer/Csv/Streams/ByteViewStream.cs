@@ -8,6 +8,17 @@ internal class ByteViewStream
     private ByteView _view;
     private int _capacity;
 
+    internal int StartIdx
+    {
+        get => _view.StartIdx;
+        set
+        {
+            int tmp = StartIdx;
+            _view.StartIdx = value;
+            Capacity -= StartIdx - tmp;
+        }
+    }
+    
     internal int Length
     {
         get => _view.Length;
@@ -42,9 +53,9 @@ internal class ByteViewStream
             _capacity = value;
         }
     }
-    internal int Position => _view.StartIdx + _view.Length;
+    internal int Position => StartIdx + Length;
 
-    internal int AbsCapacityPos => _view.StartIdx + Capacity;
+    internal int AbsCapacityPos => StartIdx + Capacity;
     
     internal ByteViewStream(byte[] bytes)
     {
@@ -74,8 +85,8 @@ internal class ByteViewStream
     /// </returns>
     internal bool Skip()
     {
-        _view.StartIdx += Length;
-        return _view.StartIdx + _view.Length >= _view.Values.Length;
+        StartIdx += Length;
+        return StartIdx + Length >= _view.Values.Length;
     }
 
     internal int Consume()

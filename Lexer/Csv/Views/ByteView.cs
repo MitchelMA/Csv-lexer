@@ -38,6 +38,8 @@ public class ByteView : View<byte>
         for (int i = 0; i < l; i++)
         {
             tmpLen = skips[i] - tmpStart;
+            if (tmpLen >= Length)
+                break;
             if(tmpLen < 0)
                 continue;
             Collect(_sb, tmpStart, tmpLen-1);

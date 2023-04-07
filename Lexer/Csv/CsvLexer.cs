@@ -79,6 +79,13 @@ public class CsvLexer : IDisposable
         return _splits;
     }
 
+    public ByteView[][] Lex2()
+    {
+        var lines = GetLines2();
+        CsvSplitter2 splitter = new(lines, _settings);
+        return splitter.Split();
+    }
+
     public T[] Deserialize<T>() where T : new()
     {
         if (!_settings.FirstIsHeader)
