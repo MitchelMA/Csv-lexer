@@ -24,7 +24,7 @@ public class CsvLexer : IDisposable
 
     public CsvLexer(string fileText)
     {
-        // _sStream = new(fileText);
+        _sStream = new(fileText);
         _bvStream = new(fileText);
     }
 
@@ -34,8 +34,9 @@ public class CsvLexer : IDisposable
             throw new FileNotFoundException($"File {file.FullName} does not exist");
 
         _file = file;
-        // _sStream = new(File.ReadAllText(file.FullName));
-        _bvStream = new(File.ReadAllText(file.FullName));
+        string text = File.ReadAllText(file.FullName);
+        _sStream = new(text);
+        _bvStream = new(text);
     }
 
     public CsvLexer(string fileText, CsvSettings settings) : this(fileText)
@@ -48,7 +49,7 @@ public class CsvLexer : IDisposable
         _settings = settings;
     }
 
-    private string[] GetLines()
+    public string[] GetLines()
     {
         CsvLiner liner = new(_sStream, _settings);
         string[] lines = liner.GetLines();
@@ -148,7 +149,7 @@ public class CsvLexer : IDisposable
 
     private void ReleaseManagedResources()
     {
-        // _sStream.Dispose();
+        _sStream.Dispose();
     }
 
     private void ReleaseUnmanagedResources()

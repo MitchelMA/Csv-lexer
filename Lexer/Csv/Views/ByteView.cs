@@ -40,7 +40,7 @@ public class ByteView : View<byte>
             tmpLen = skips[i] - tmpStart;
             if(tmpLen < 0)
                 continue;
-            Collect(_sb, tmpStart, tmpLen);
+            Collect(_sb, tmpStart, tmpLen-1);
 
             tmpStart = skips[i]+1;
         }

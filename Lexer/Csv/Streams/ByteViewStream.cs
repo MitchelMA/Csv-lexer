@@ -102,4 +102,12 @@ internal class ByteViewStream
 
     internal bool AddSkipAtCurrentPosition() =>
         _view.AddSkip(Position);
+    
+    internal bool AddSkipAtLastPosition()
+    {
+        if (Length == 0)
+            return false;
+
+        return _view.AddSkip(Position - 1);
+    }
 }

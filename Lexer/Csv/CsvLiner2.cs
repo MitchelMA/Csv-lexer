@@ -27,6 +27,8 @@ internal class CsvLiner2
       _modi.Clear();
       
       _modi.Add(LexModi.Default, DefaultHandler);
+      _modi.Add(LexModi.String, StringHandler);
+      _modi.Add(LexModi.Comment, CommentHandler);
    }
 
    internal ByteView[] GetLines()
@@ -42,8 +44,8 @@ internal class CsvLiner2
    private bool _EOLProc()
    {
       ByteView curLine = _bvStream.Capture();
-      curLine.Trim();
       _bvStream.Skip();
+      curLine.Trim();
       if (_settings.Patches && curLine.Length == 0)
          return false;
       
@@ -55,21 +57,24 @@ internal class CsvLiner2
    {
       while ((_lastChar = _bvStream.Peek()) != -1)
       {
+         if (_lastChar == _settings.CommentStarter)
+         {
+            _currentMode = LexModi.Comment;
+            return true;
+         }
+
+         if (_lastChar == '"')
+         {
+            _currentMode = LexModi.String;
+            return true;
+         }
+
          if (_lastChar == '\n')
          {
             _bvStream.AddSkipAtCurrentPosition();
             _EOLProc();
          }
 
-         if (_lastChar == ',')
-         {
-            _bvStream.AddSkipAtCurrentPosition();
-            _EOLProc();
-         }
-
-         if (_lastChar == '"')
-            _bvStream.AddSkipAtCurrentPosition();
-            
          _bvStream.Consume();
       }
 
@@ -80,11 +85,50 @@ internal class CsvLiner2
 
    private bool StringHandler()
    {
-      throw new NotImplementedException();
+      // consume string-starter `"`
+      _bvStream.Consume();
+      if (_bvStream.Peek() == '"')
+         throw new Exception($"Cannot start string with two double-quotes `\"\"` at {_bvStream.Capture()}:position {_bvStream.Position}");
+
+      while ((_lastChar = _bvStream.Peek()) != -1)
+      {
+         if (_lastChar == '"')
+         {
+            _bvStream.Consume();
+            int t = _bvStream.Peek();
+
+            if (t == -1)
+            {
+               _EOLProc();
+               _lastChar = -1;
+               return false;
+            }
+
+            if (t != '"')
+            {
+               _currentMode = LexModi.Default;
+               return true;
+            }
+         }
+
+         _bvStream.Consume();
+      }
+      
+      throw new Exception($"String never ended with `\"` at {_bvStream.Capture()}:position {_bvStream.Position}");
    }
 
    private bool CommentHandler()
    {
-      throw new NotImplementedException();
+      while ((_lastChar = _bvStream.Consume()) is not '\n' and not -1)
+      {
+         _bvStream.AddSkipAtLastPosition();
+      }
+
+      _EOLProc();
+      if (_lastChar == -1)
+         return false;
+
+      _currentMode = LexModi.Default;
+      return true;
    }
 }

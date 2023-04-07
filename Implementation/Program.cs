@@ -134,10 +134,28 @@ internal static class Program
 
     internal static void Main(string[] args)
     {
-        FileInfo fi = new(PathHelper.ToAbsoluteDomain(Files[0]));
+        // FileInfo fi = new(PathHelper.ToAbsoluteDomain(@"E:\Libraries\Downloads\big.csv"));
+        FileInfo fi = new(PathHelper.ToAbsoluteDomain(Files[2]));
         using CsvLexer lexer = new(fi, CsvSettings);
-        ByteView[] values = lexer.GetLines2();
-        foreach(var value in values)
-            Console.WriteLine(value);
+        var sw = Stopwatch.StartNew();
+        var lines = lexer.GetLines2();
+        sw.Stop();
+        Console.WriteLine(sw.Elapsed.TotalSeconds);
+        Console.WriteLine($"{GC.GetTotalMemory(true) * 9.537E-7f}mb usage\n");
+        
+        Console.WriteLine(lines[0]);
+        Console.WriteLine(lines[1]);
+        // foreach(var line in lines)
+        //     Console.WriteLine(line);
+        
+        // Console.WriteLine();
+        //
+        // sw.Restart();
+        // ByteView[] values = lexer.GetLines2();
+        // sw.Stop();
+        // Console.WriteLine(sw.Elapsed.TotalSeconds);
+        
+        // foreach(var value in values)
+        //     Console.WriteLine(value);
     }
 }
